@@ -13,6 +13,37 @@ export default function AuthModal({ isOpen, onClose, onLogin, activeLang }) {
     onClose();
   };
 
+  // Telegram Login Callback
+  window.onTelegramAuth = (user) => {
+    console.log('Telegram User Authenticated:', user);
+    onLogin({ 
+      name: user.username || user.first_name, 
+      method: 'tg', 
+      badge: '✅ Verified via Telegram',
+      photo: user.photo_url 
+    });
+    onClose();
+  };
+
+  React.useEffect(() => {
+    if (authStep === 'select' && isOpen) {
+      const script = document.createElement('script');
+      script.src = "https://telegram.org/js/telegram-widget.js?22";
+      script.setAttribute('data-telegram-login', "optd_login_bot"); // Bot username updated
+      script.setAttribute('data-size', "large");
+      script.setAttribute('data-radius', "12");
+      script.setAttribute('data-onauth', "onTelegramAuth(user)");
+      script.setAttribute('data-request-access', "write");
+      script.async = true;
+      
+      const container = document.getElementById('telegram-login-container');
+      if (container) {
+        container.innerHTML = ''; // Tozalash
+        container.appendChild(script);
+      }
+    }
+  }, [authStep, isOpen]);
+
   const texts = {
     uz: {
       title: "Tizimga kirish",
@@ -75,17 +106,17 @@ export default function AuthModal({ isOpen, onClose, onLogin, activeLang }) {
 
         {authStep === 'select' && (
           <div className="space-y-4">
-            <button 
-              onClick={() => handleSimulateLogin('tg')}
-              className="w-full flex items-center justify-center gap-3 bg-[#2AABEE] hover:bg-[#229ED9] text-white py-3.5 rounded-xl font-medium transition-colors shadow-[0_4px_20px_rgba(42,171,238,0.3)]"
-            >
-              <MessageCircle size={20} />
-              {t.tgBtn}
-            </button>
+            <div id="telegram-login-container" className="w-full flex justify-center mb-2">
+              {/* Telegram Widget shu yerda paydo bo'ladi */}
+            </div>
             
             <button 
               onClick={() => setAuthStep('phone')}
               className="w-full flex items-center justify-center gap-3 bg-white/5 hover:bg-white/10 border border-white/10 text-white py-3.5 rounded-xl font-medium transition-colors"
+            >
+              <Phone size={20} />
+              {t.smsBtn}
+            </button>.5 rounded-xl font-medium transition-colors"
             >
               <Phone size={20} />
               {t.smsBtn}

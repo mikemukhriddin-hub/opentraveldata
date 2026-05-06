@@ -141,8 +141,12 @@ function App() {
                   <span className="text-sm font-semibold">{user.name}</span>
                   <span className="text-[10px] bg-gold/10 text-gold px-1.5 py-0.5 rounded border border-gold/20">{user.badge}</span>
                 </div>
-                <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-cyan to-blue-600 flex items-center justify-center text-white shadow-[0_0_15px_rgba(0,229,255,0.4)] cursor-pointer hover:scale-105 transition">
-                  <User size={18} />
+                <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-cyan to-blue-600 flex items-center justify-center text-white shadow-[0_0_15px_rgba(0,229,255,0.4)] cursor-pointer hover:scale-105 transition overflow-hidden">
+                  {user.photo ? (
+                    <img src={user.photo} alt={user.name} className="w-full h-full object-cover" />
+                  ) : (
+                    <User size={18} />
+                  )}
                 </div>
                 <button 
                   onClick={() => setUser(null)}
