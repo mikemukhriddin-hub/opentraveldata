@@ -1,0 +1,19 @@
+id^iata_code^icao_code^locode^name_uz^name_en^name_ru^type^latitude^longitude^region
+1^TAS^UTTT^UZTAS^Toshkent Xalqaro Aeroporti^Tashkent International Airport^Международный аэропорт Ташкент^A^41.2578^69.2811^Tashkent
+2^SKD^UTSS^UZSKD^Samarqand Xalqaro Aeroporti^Samarkand International Airport^Международный аэропорт Самарканд^A^39.7006^66.9844^Samarkand
+3^BHK^UTSB^UZBHK^Buxoro Xalqaro Aeroporti^Bukhara International Airport^Международный аэропорт Бухара^A^39.7747^64.4833^Bukhara
+4^UGC^UTNU^UZUGC^Urganch Xalqaro Aeroporti^Urgench International Airport^Международный аэропорт Ургенч^A^41.5842^60.6414^Khorezm
+5^NVI^UTSA^UZNVI^Navoiy Xalqaro Aeroporti^Navoi International Airport^Международный аэропорт Навои^A^40.1186^65.1764^Navoi
+6^FEG^UTKF^UZFEG^Farg'ona Xalqaro Aeroporti^Fergana International Airport^Международный аэропорт Фергана^A^40.3578^71.7456^Fergana
+7^NMA^UTFN^UZNMA^Namangan Xalqaro Aeroporti^Namangan International Airport^Международный аэропорт Наманган^A^40.975^71.5583^Namangan
+8^NCU^UTNN^UZNCU^Nukus Xalqaro Aeroporti^Nukus International Airport^Международный аэропорт Нукус^A^42.4878^59.6231^Karakalpakstan
+9^TMJ^UTST^UZTMJ^Termiz Xalqaro Aeroporti^Termez International Airport^Международный аэропорт Термез^A^37.2867^67.3075^Surkhandarya
+10^AZN^UTKA^UZAZN^Andijon Xalqaro Aeroporti^Andizhan International Airport^Международный аэропорт Андижан^A^40.7283^72.3392^Andijan
+11^KSQ^UTSK^UZKSQ^Qarshi Xalqaro Aeroporti^Karshi International Airport^Международный аэропорт Карши^A^38.8000^65.7167^Kashkadarya
+12^^^UZTAS^Toshkent Shimoliy Vokzali^Tashkent Northern Railway Station^Ташкент-Северный вокзал^R^41.2933^69.2881^Tashkent
+13^^^UZTAS^Toshkent Janubiy Vokzali^Tashkent Southern Railway Station^Ташкент-Южный вокзал^R^41.2683^69.2272^Tashkent
+14^^^UZSKD^Samarqand Vokzali^Samarkand Railway Station^Самаркандский вокзал^R^39.6736^66.9242^Samarkand
+15^^^UZKGN^Buxoro Vokzali (Kogon)^Bukhara Railway Station (Kagan)^Бухарский вокзал (Каган)^R^39.7225^64.5508^Bukhara
+16^^^UZNVI^Navoiy Vokzali^Navoi Railway Station^Навоийский вокзал^R^40.0931^65.3725^Navoi
+17^^^UZKSQ^Qarshi Vokzali^Karshi Railway Station^Каршинский вокзал^R^38.8617^65.7722^Kashkadarya
+18^^^UZNCU^Nukus Vokzali^Nukus Railway Station^Нукусский вокзал^R^42.4633^59.6050^Karakalpakstan
