@@ -107,16 +107,21 @@ export default function AuthModal({ isOpen, onClose, onLogin, activeLang }) {
         </div>
 
         {authStep === 'select' && (
-          <div className="space-y-4">
-            <div id="telegram-login-container" className="w-full flex justify-center mb-2">
-              {/* Telegram Widget shu yerda paydo bo'ladi */}
+          <div className="space-y-6">
+            <div className="relative group p-[2px] rounded-2xl bg-gradient-to-r from-transparent via-cyan/30 to-transparent hover:via-cyan/60 transition-all duration-500">
+              <div id="telegram-login-container" className="relative w-full flex justify-center py-4 bg-[#0A0F1A]/80 backdrop-blur-xl rounded-[14px] border border-white/5 shadow-inner">
+                {/* Telegram Widget shu yerda paydo bo'ladi */}
+              </div>
+              <div className="absolute -inset-1 bg-cyan/10 blur-xl rounded-2xl -z-10 group-hover:bg-cyan/20 transition-all"></div>
             </div>
             
             <button 
               onClick={() => setAuthStep('phone')}
-              className="w-full flex items-center justify-center gap-3 bg-white/5 hover:bg-white/10 border border-white/10 text-white py-3.5 rounded-xl font-medium transition-colors"
+              className="w-full flex items-center justify-center gap-3 bg-white/5 hover:bg-white/10 border border-white/10 text-white py-4 rounded-2xl font-medium transition-all hover:border-white/20 group"
             >
-              <Phone size={20} />
+              <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center group-hover:bg-white/10 transition-colors">
+                <Phone size={18} className="text-muted group-hover:text-white" />
+              </div>
               {t.smsBtn}
             </button>
 
