@@ -190,33 +190,61 @@ export default function AuthModal({ isOpen, onClose, onLogin, activeLang }) {
         )}
 
         {authStep === 'sms' && (
-          <div className="space-y-5">
-            <div>
-              <label className="block text-sm font-medium text-muted mb-2 text-center">{t.smsTitle}</label>
-              <p className="text-xs text-cyan mb-6 text-center">{phone} raqamiga maxfiy kod yuborildi</p>
-              <div className="flex gap-2 justify-center mb-4">
-                {[1,2,3,4,5].map(i => (
+          <div className="space-y-6 animate-fade-in">
+            <div className="text-center">
+              <label className="block text-sm font-medium text-muted mb-2">{t.smsTitle}</label>
+              <p className="text-xs text-cyan mb-8">{phone} raqamiga tasdiqlash kodi yuborildi</p>
+              
+              <div className="flex gap-3 justify-center mb-8">
+                {[0, 1, 2, 3, 4].map((index) => (
                   <input 
-                    key={i} 
+                    key={index}
+                    id={`otp-${index}`}
                     type="text" 
                     maxLength={1} 
-                    className="w-12 h-14 bg-[#070B14] border border-white/10 rounded-xl text-center text-2xl font-bold text-white outline-none focus:border-cyan focus:shadow-[0_0_10px_rgba(0,229,255,0.3)] transition-all" 
+                    value={smsCode[index] || ''}
+                    onChange={(e) => {
+                      const val = e.target.value.replace(/[^0-9]/g, '');
+                      if (val) {
+                        const newCode = smsCode.split('');
+                        newCode[index] = val;
+                        const combined = newCode.join('');
+                        setSmsCode(combined);
+                        if (index < 4) document.getElementById(`otp-${index + 1}`).focus();
+                      }
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Backspace' && !smsCode[index] && index > 0) {
+                        document.getElementById(`otp-${index - 1}`).focus();
+                      }
+                    }}
+                    className="w-12 h-14 bg-[#070B14] border border-white/10 rounded-xl text-center text-2xl font-bold text-white outline-none focus:border-cyan focus:shadow-[0_0_15px_rgba(0,229,255,0.2)] transition-all" 
                   />
                 ))}
               </div>
             </div>
+
             <button 
-              onClick={() => handleSimulateLogin('sms')}
-              className="w-full btn-primary py-3.5 shadow-[0_4px_20px_rgba(0,229,255,0.3)]"
+              onClick={() => {
+                if (smsCode.length === 5) {
+                  handleSimulateLogin('sms');
+                } else {
+                  alert("Iltimos, 5 xonali kodni kiriting (Masalan: 12345)");
+                }
+              }}
+              className="w-full btn-primary py-4 shadow-[0_4px_20px_rgba(0,229,255,0.3)] font-semibold tracking-wide"
             >
               {t.verifySms}
             </button>
-            <button 
-              onClick={() => setAuthStep('phone')}
-              className="w-full text-sm text-muted hover:text-white transition py-2"
-            >
-              {t.back}
-            </button>
+            
+            <div className="text-center">
+              <button 
+                onClick={() => setAuthStep('phone')}
+                className="text-sm text-muted hover:text-white transition py-2"
+              >
+                {t.back}
+              </button>
+            </div>
           </div>
         )}
 
