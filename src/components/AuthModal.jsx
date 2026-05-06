@@ -109,8 +109,19 @@ export default function AuthModal({ isOpen, onClose, onLogin, activeLang }) {
         {authStep === 'select' && (
           <div className="space-y-6">
             <div className="relative group p-[2px] rounded-2xl bg-gradient-to-r from-transparent via-cyan/30 to-transparent hover:via-cyan/60 transition-all duration-500">
-              <div id="telegram-login-container" className="relative w-full flex justify-center py-4 bg-[#0A0F1A]/80 backdrop-blur-xl rounded-[14px] border border-white/5 shadow-inner">
-                {/* Telegram Widget shu yerda paydo bo'ladi */}
+              <div id="telegram-login-container" className="relative w-full flex justify-center py-4 bg-[#0A0F1A]/80 backdrop-blur-xl rounded-[14px] border border-white/5 shadow-inner min-h-[60px]">
+                {window.location.hostname === 'localhost' ? (
+                  <button 
+                    onClick={() => handleSimulateLogin('tg')}
+                    className="flex items-center gap-2 text-cyan hover:text-white transition-colors"
+                  >
+                    <MessageCircle size={18} />
+                    Lokal test (Telegram simulyatsiyasi)
+                  </button>
+                ) : (
+                  /* Telegram Widget shu yerda paydo bo'ladi */
+                  <div className="animate-pulse text-muted text-xs">Telegram bog'lanmoqda...</div>
+                )}
               </div>
               <div className="absolute -inset-1 bg-cyan/10 blur-xl rounded-2xl -z-10 group-hover:bg-cyan/20 transition-all"></div>
             </div>
