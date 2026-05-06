@@ -5,10 +5,55 @@ export default function AuthModal({ isOpen, onClose, onLogin, activeLang }) {
   const [authStep, setAuthStep] = useState('select'); // select, phone, sms
   const [phone, setPhone] = useState('+998 ');
   const [smsCode, setSmsCode] = useState('');
+  const [generatedCode, setGeneratedCode] = useState(null);
+  const [isSending, setIsSending] = useState(false);
 
-  const handleSimulateLogin = (method) => {
-    onLogin({ name: method === 'tg' ? 'Azizbek_Dev' : 'DeveloperUser', method, badge: '🌟 Contributor' });
-    onClose();
+  const handleSimulateLogin = (method, code = null) => {
+    if (method === 'sms') {
+      if (code === generatedCode) {
+        onLogin({ name: phone, method: 'phone', badge: '📱 Verified Phone' });
+        onClose();
+      } else {
+        alert("Xato kod! Qayta urinib ko'ring (Test uchun: " + generatedCode + ")");
+        return;
+      }
+    } else {
+      onLogin({ name: method === 'tg' ? 'Azizbek_Dev' : 'DeveloperUser', method, badge: '🌟 Contributor' });
+      onClose();
+    }
+  };
+
+  const sendSmsCode = async () => {
+    if (phone.length < 13) {
+      alert("Telefon raqamingizni to'liq kiriting!");
+      return;
+    }
+
+    setIsSending(true);
+    
+    // 1. 5 xonali tasodifiy kod yaratish
+    const code = Math.floor(10000 + Math.random() * 90000).toString();
+    setGeneratedCode(code);
+    setSmsCode(''); // Oldingi kodni tozalash
+
+    try {
+      // 2. Haqiqiy API (masalan Eskiz.uz) ulanadigan joy
+      // Hozircha simulyatsiya:
+      console.log(`[SMS SERVICE] ${phone} raqamiga kod yuborilmoqda: ${code}`);
+      
+      // Real API chaqiruvi quyidagicha bo'ladi:
+      // await fetch('/api/send-sms', { method: 'POST', body: JSON.stringify({ phone, code }) });
+      
+      setTimeout(() => {
+        setIsSending(false);
+        setAuthStep('sms');
+        // Test uchun kodni ko'rsatib qo'yamiz (haqiqiy tizimda bu bo'lmaydi)
+        alert("Tasdiqlash kodi: " + code); 
+      }, 1500);
+    } catch (error) {
+      alert("SMS yuborishda xatolik yuz berdi!");
+      setIsSending(false);
+    }
   };
 
   // Telegram Login Callback
@@ -175,10 +220,11 @@ export default function AuthModal({ isOpen, onClose, onLogin, activeLang }) {
               </div>
             </div>
             <button 
-              onClick={() => setAuthStep('sms')}
-              className="w-full btn-primary py-3.5 flex items-center justify-center gap-2 shadow-[0_4px_20px_rgba(0,229,255,0.3)]"
+              onClick={sendSmsCode}
+              disabled={isSending}
+              className="w-full btn-primary py-3.5 flex items-center justify-center gap-2 shadow-[0_4px_20px_rgba(0,229,255,0.3)] disabled:opacity-50"
             >
-              {t.sendSms} <ArrowRight size={18} />
+              {isSending ? 'Yuborilmoqda...' : t.sendSms} <ArrowRight size={18} />
             </button>
             <button 
               onClick={() => setAuthStep('select')}
@@ -227,9 +273,9 @@ export default function AuthModal({ isOpen, onClose, onLogin, activeLang }) {
             <button 
               onClick={() => {
                 if (smsCode.length === 5) {
-                  handleSimulateLogin('sms');
+                  handleSimulateLogin('sms', smsCode);
                 } else {
-                  alert("Iltimos, 5 xonali kodni kiriting (Masalan: 12345)");
+                  alert("Iltimos, 5 xonali kodni to'liq kiriting!");
                 }
               }}
               className="w-full btn-primary py-4 shadow-[0_4px_20px_rgba(0,229,255,0.3)] font-semibold tracking-wide"
