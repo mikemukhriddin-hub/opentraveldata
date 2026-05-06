@@ -116,10 +116,6 @@ export default function AuthModal({ isOpen, onClose, onLogin, activeLang }) {
             >
               <Phone size={20} />
               {t.smsBtn}
-            </button>.5 rounded-xl font-medium transition-colors"
-            >
-              <Phone size={20} />
-              {t.smsBtn}
             </button>
 
             <div className="py-4 flex items-center gap-4 text-muted text-xs uppercase tracking-wider">
