@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, Phone, MessageCircle, Code, Mail, ArrowRight, ShieldCheck } from 'lucide-react';
 
 export default function AuthModal({ isOpen, onClose, onLogin, activeLang }) {
@@ -6,30 +6,30 @@ export default function AuthModal({ isOpen, onClose, onLogin, activeLang }) {
   const [phone, setPhone] = useState('+998 ');
   const [smsCode, setSmsCode] = useState('');
 
-  if (!isOpen) return null;
-
   const handleSimulateLogin = (method) => {
     onLogin({ name: method === 'tg' ? 'Azizbek_Dev' : 'DeveloperUser', method, badge: '🌟 Contributor' });
     onClose();
   };
 
   // Telegram Login Callback
-  window.onTelegramAuth = (user) => {
-    console.log('Telegram User Authenticated:', user);
-    onLogin({ 
-      name: user.username || user.first_name, 
-      method: 'tg', 
-      badge: '✅ Verified via Telegram',
-      photo: user.photo_url 
-    });
-    onClose();
-  };
+  useEffect(() => {
+    window.onTelegramAuth = (user) => {
+      console.log('Telegram User Authenticated:', user);
+      onLogin({ 
+        name: user.username || user.first_name, 
+        method: 'tg', 
+        badge: '✅ Verified via Telegram',
+        photo: user.photo_url 
+      });
+      onClose();
+    };
+  }, [onLogin, onClose]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (authStep === 'select' && isOpen) {
       const script = document.createElement('script');
       script.src = "https://telegram.org/js/telegram-widget.js?22";
-      script.setAttribute('data-telegram-login', "optd_login_bot"); // Bot username updated
+      script.setAttribute('data-telegram-login', "optd_login_bot"); 
       script.setAttribute('data-size', "large");
       script.setAttribute('data-radius', "12");
       script.setAttribute('data-onauth', "onTelegramAuth(user)");
@@ -38,7 +38,7 @@ export default function AuthModal({ isOpen, onClose, onLogin, activeLang }) {
       
       const container = document.getElementById('telegram-login-container');
       if (container) {
-        container.innerHTML = ''; // Tozalash
+        container.innerHTML = ''; 
         container.appendChild(script);
       }
     }
@@ -76,7 +76,7 @@ export default function AuthModal({ isOpen, onClose, onLogin, activeLang }) {
       smsBtn: "Вход по SMS (+998)",
       devTitle: "Для разработчиков",
       phoneTitle: "Ваш номер телефона",
-      sendSms: "Отправить SMS код",
+      sendSms: "Отправить SMS kod",
       smsTitle: "Введите SMS код",
       verifySms: "Подтвердить",
       back: "Назад"
@@ -85,13 +85,15 @@ export default function AuthModal({ isOpen, onClose, onLogin, activeLang }) {
 
   const t = texts[activeLang] || texts.uz;
 
+  if (!isOpen) return null;
+
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
       {/* Backdrop */}
       <div className="absolute inset-0 bg-black/70 backdrop-blur-md" onClick={onClose}></div>
       
       {/* Modal */}
-      <div className="relative w-full max-w-md glass-panel p-8 animate-fade-in border border-white/20 shadow-[0_0_50px_rgba(0,229,255,0.15)] bg-[#0A0F1A]/90">
+      <div className="relative w-full max-w-md glass-panel p-8 border border-white/20 shadow-[0_0_50px_rgba(0,229,255,0.15)] bg-[#0A0F1A]/90">
         <button onClick={onClose} className="absolute top-4 right-4 text-muted hover:text-white transition bg-white/5 hover:bg-white/10 p-2 rounded-full">
           <X size={20} />
         </button>
@@ -142,7 +144,7 @@ export default function AuthModal({ isOpen, onClose, onLogin, activeLang }) {
         )}
 
         {authStep === 'phone' && (
-          <div className="space-y-5 animate-fade-in">
+          <div className="space-y-5">
             <div>
               <label className="block text-sm font-medium text-muted mb-2">{t.phoneTitle}</label>
               <div className="flex items-center bg-[#070B14] border border-white/10 rounded-xl px-4 py-1 focus-within:border-cyan transition-colors">
@@ -172,7 +174,7 @@ export default function AuthModal({ isOpen, onClose, onLogin, activeLang }) {
         )}
 
         {authStep === 'sms' && (
-          <div className="space-y-5 animate-fade-in">
+          <div className="space-y-5">
             <div>
               <label className="block text-sm font-medium text-muted mb-2 text-center">{t.smsTitle}</label>
               <p className="text-xs text-cyan mb-6 text-center">{phone} raqamiga maxfiy kod yuborildi</p>
