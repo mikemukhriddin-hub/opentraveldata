@@ -268,6 +268,12 @@ export default function AuthModal({ isOpen, onClose, onLogin, activeLang }) {
                   />
                 ))}
               </div>
+              {generatedCode && (
+                <div className="mb-4 p-2 bg-cyan/5 border border-cyan/20 rounded-lg animate-pulse">
+                  <p className="text-[10px] text-cyan uppercase tracking-widest font-bold">Dasturchi rejimi / Test kodi:</p>
+                  <p className="text-xl font-mono text-white tracking-[0.5em]">{generatedCode}</p>
+                </div>
+              )}
             </div>
 
             <button 
