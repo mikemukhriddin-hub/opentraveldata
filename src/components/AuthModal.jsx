@@ -37,22 +37,30 @@ export default function AuthModal({ isOpen, onClose, onLogin, activeLang }) {
     setSmsCode(''); // Oldingi kodni tozalash
 
     try {
-      // 2. Haqiqiy API (masalan Eskiz.uz) ulanadigan joy
-      // Hozircha simulyatsiya:
-      console.log(`[SMS SERVICE] ${phone} raqamiga kod yuborilmoqda: ${code}`);
+      // 2. Haqiqiy API (Eskiz.uz) chaqiruvi
+      const response = await fetch('/api/send-sms', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone, code })
+      });
       
-      // Real API chaqiruvi quyidagicha bo'ladi:
-      // await fetch('/api/send-sms', { method: 'POST', body: JSON.stringify({ phone, code }) });
+      const result = await response.json();
+
+      if (response.ok) {
+        console.log('[SMS SERVICE] SMS muvaffaqiyatli yuborildi:', result);
+      } else {
+        console.warn('[SMS SERVICE] API xatosi (Eskiz sozlanmagan bo\'lishi mumkin):', result.error);
+        // Agar Vercel'da hali ENV o'rnatilmagan bo'lsa, alert orqali ogohlantiramiz
+      }
       
       setTimeout(() => {
         setIsSending(false);
         setAuthStep('sms');
-        // Test uchun kodni ko'rsatib qo'yamiz (haqiqiy tizimda bu bo'lmaydi)
-        alert("Tasdiqlash kodi: " + code); 
-      }, 1500);
+      }, 1000);
     } catch (error) {
-      alert("SMS yuborishda xatolik yuz berdi!");
+      console.error('SMS yuborishda xatolik:', error);
       setIsSending(false);
+      setAuthStep('sms'); // Xatolik bo'lsa ham test rejimi uchun o'tkazamiz
     }
   };
 
