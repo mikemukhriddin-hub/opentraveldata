@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Search, MapPin, Globe, PlaneTakeoff, Train, Activity, Menu, Bell, User, Star, ChevronRight, Edit2 } from 'lucide-react';
+import { Search, MapPin, Globe, PlaneTakeoff, Train, Activity, Menu, Bell, User, Star, ChevronRight, Edit2, Shield } from 'lucide-react';
 import transportNodes from './data/transport_nodes.json';
 import AuthModal from './components/AuthModal';
 import EditModal from './components/EditModal';
 import ApiModal from './components/ApiModal';
+import AdminPanel from './components/AdminPanel';
 
 function App() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -14,6 +15,7 @@ function App() {
   const [editingNode, setEditingNode] = useState(null);
   const [isApiOpen, setIsApiOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('discover'); // discover, routes
+  const [currentView, setCurrentView] = useState('home'); // home, admin
   const [routeSearch, setRouteSearch] = useState({ from: 'Toshkent (TAS)', to: 'Samarqand (SKD)' });
   const [isCalculating, setIsCalculating] = useState(false);
   const [routeResults, setRouteResults] = useState(null);
@@ -92,15 +94,15 @@ function App() {
 
         <nav className="flex-1 p-4 flex flex-col gap-2">
           <button 
-            onClick={() => setActiveTab('discover')}
-            className={`flex items-center gap-3 p-3 rounded-xl transition-all ${activeTab === 'discover' ? 'bg-white/5 text-cyan border border-white/10' : 'text-muted hover:text-white hover:bg-white/5'}`}
+            onClick={() => { setActiveTab('discover'); setCurrentView('home'); }}
+            className={`flex items-center gap-3 p-3 rounded-xl transition-all ${activeTab === 'discover' && currentView === 'home' ? 'bg-white/5 text-cyan border border-white/10' : 'text-muted hover:text-white hover:bg-white/5'}`}
           >
             <Globe size={20} />
             <span className="font-medium">Katalog</span>
           </button>
           <button 
-            onClick={() => setActiveTab('routes')}
-            className={`flex items-center gap-3 p-3 rounded-xl transition-all ${activeTab === 'routes' ? 'bg-white/5 text-cyan border border-white/10' : 'text-muted hover:text-white hover:bg-white/5'}`}
+            onClick={() => { setActiveTab('routes'); setCurrentView('home'); }}
+            className={`flex items-center gap-3 p-3 rounded-xl transition-all ${activeTab === 'routes' && currentView === 'home' ? 'bg-white/5 text-cyan border border-white/10' : 'text-muted hover:text-white hover:bg-white/5'}`}
           >
             <PlaneTakeoff size={20} />
             <span className="font-medium">Yo'nalishlar</span>
@@ -110,6 +112,16 @@ function App() {
             <MapPin size={20} />
             <span className="font-medium">Hududlar (GPS)</span>
           </a>
+          
+          {user && (
+            <button 
+              onClick={() => { setCurrentView('admin'); setActiveTab(null); }}
+              className={`flex items-center gap-3 p-3 rounded-xl transition-all mt-4 border border-cyan/20 ${currentView === 'admin' ? 'bg-cyan/10 text-cyan shadow-[0_0_15px_rgba(0,229,255,0.2)]' : 'bg-white/5 text-muted hover:text-white hover:bg-white/10'}`}
+            >
+              <Shield size={20} />
+              <span className="font-medium">Boshqaruv</span>
+            </button>
+          )}
         </nav>
 
         <div className="p-4 border-t border-white/5">
@@ -199,9 +211,15 @@ function App() {
           </div>
         </div>
 
-        {/* Content Section (Results or Dashboard or Routes) */}
+        {/* Content Section (Results or Dashboard or Routes or Admin) */}
         <main className="flex-1 px-6 md:px-10 pb-10 max-w-5xl mx-auto w-full mt-10">
-          {activeTab === 'routes' ? (
+          {currentView === 'admin' ? (
+            <AdminPanel 
+              nodes={nodes} 
+              onUpdateNodes={setNodes} 
+              activeLang={activeLang} 
+            />
+          ) : activeTab === 'routes' ? (
             <div className="animate-fade-in">
               <h2 className="text-3xl font-bold mb-6 flex items-center gap-3">
                 <PlaneTakeoff className="text-cyan" /> Avtomatik yo'nalishlar
