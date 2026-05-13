@@ -66,9 +66,9 @@ export default function AuthModal({ isOpen, onClose, onLogin, activeLang }) {
 
   useEffect(() => {
     if (authStep === 'select' && isOpen) {
-      // Global callback funksiyasini o'rnatish
+      // 1. Global callbackni darhol o'rnatamiz
       window.onTelegramAuth = (user) => {
-        console.log('Telegram User Authenticated:', user);
+        console.log('Telegram Auth Success:', user);
         onLogin({ 
           name: user.username || user.first_name, 
           method: 'tg', 
@@ -78,12 +78,13 @@ export default function AuthModal({ isOpen, onClose, onLogin, activeLang }) {
         onClose();
       };
 
+      // 2. Scriptni yaratish
       const script = document.createElement('script');
       script.src = "https://telegram.org/js/telegram-widget.js?22";
       script.setAttribute('data-telegram-login', "optd_login_bot"); 
       script.setAttribute('data-size', "large");
       script.setAttribute('data-radius', "12");
-      script.setAttribute('data-onauth', "onTelegramAuth"); // Parametrsiz faqat nomi bo'lishi kerak
+      script.setAttribute('data-onauth', "onTelegramAuth");
       script.setAttribute('data-request-access', "write");
       script.async = true;
       
@@ -93,6 +94,11 @@ export default function AuthModal({ isOpen, onClose, onLogin, activeLang }) {
         container.appendChild(script);
       }
     }
+
+    return () => {
+      // Cleanup: Modal yopilganda callbackni o'chirmaymiz (zararsiz), 
+      // lekin scriptni qayta yuklanishini oldini olamiz
+    };
   }, [authStep, isOpen, onLogin, onClose]);
 
   const texts = {
