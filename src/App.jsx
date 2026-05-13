@@ -606,7 +606,10 @@ function App() {
                   <p className="text-muted text-sm">{nodes.filter(n=>n.type==='R').length} {t.railDesc}</p>
                 </div>
 
-                <div className="glass-panel p-6 group cursor-pointer hover:-translate-y-1 transition-transform duration-300">
+                <div 
+                  onClick={() => { setActiveTab('tourism'); setActiveCategory('Historical'); }}
+                  className="glass-panel p-6 group cursor-pointer hover:-translate-y-1 transition-transform duration-300 border border-purple-500/10 hover:border-purple-500/30"
+                >
                   <div className="w-12 h-12 rounded-xl bg-purple-500/10 flex items-center justify-center text-purple-400 mb-4 group-hover:scale-110 transition-transform">
                     <Globe size={24} />
                   </div>
