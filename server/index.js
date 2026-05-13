@@ -13,6 +13,11 @@ app.use(express.json());
 
 const PORT = process.env.PORT || 5000;
 
+// Root endpoint for UptimeRobot (Keep-alive)
+app.get('/', (req, res) => {
+  res.json({ status: 'active', message: 'OPTD Uzbekistan API is running' });
+});
+
 // Middleware: Admin ekanligini tekshirish
 async function isAdmin(req, res, next) {
   const token = req.headers.authorization?.split(' ')[1];
