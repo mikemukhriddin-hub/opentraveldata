@@ -431,63 +431,28 @@ function App() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {spots
-                  .filter(spot => spot.category === activeCategory && (selectedCity === 'All' || spot.city === selectedCity))
-                  .map(spot => (
-                    <div key={spot.id} className="glass-panel group overflow-hidden hover:border-cyan/30 transition-all flex flex-col">
-                      {spot.image_url && (
-                        <div className="h-48 overflow-hidden relative">
-                          <img src={spot.image_url} alt={getLocalizedName(spot)} className="w-full h-full object-cover group-hover:scale-110 transition-duration-500" />
-                          <div className="absolute top-4 right-4 bg-black/60 backdrop-blur-md px-2 py-1 rounded-lg flex items-center gap-1 text-gold text-xs font-bold border border-white/10">
-                            <Star size={12} fill="currentColor" /> {spot.rating || '5.0'}
-                          </div>
-                        </div>
-                      )}
-                      <div className="p-6 flex-1 flex flex-col">
-                        <h3 className="text-xl font-bold mb-2 group-hover:text-cyan transition-colors">{getLocalizedName(spot)}</h3>
-                        <p className="text-muted text-xs mb-4 line-clamp-3 leading-relaxed">
-                          {getLocalizedDesc(spot)}
-                        </p>
-                        
-                        <div className="mt-auto pt-4 border-t border-white/5 space-y-3">
-                          <div className="flex items-center gap-2 text-xs text-muted">
-                            <MapPin size={14} className="text-cyan" />
-                            <span>{spot.city}</span>
-                          </div>
-                          
-                          <div className="flex items-center gap-2">
-                            {spot.map_link && (
-                              <a 
-                                href={spot.map_link} 
-                                target="_blank" 
-                                rel="noopener noreferrer"
-                                className="flex-1 bg-white/5 hover:bg-cyan/10 hover:text-cyan p-2.5 rounded-xl text-center text-xs font-semibold border border-white/5 hover:border-cyan/20 transition-all"
-                              >
-                                {t.viewOnMap}
-                              </a>
-                            )}
-                            {spot.contact && (
-                              <a 
-                                href={`tel:${spot.contact}`}
-                                className="p-2.5 bg-white/5 rounded-xl border border-white/5 hover:bg-white/10 transition-all"
-                                title={t.call}
-                              >
-                                <Activity size={16} className="text-orange-400" />
-                              </a>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
+              <div className="glass-panel overflow-hidden h-[600px] relative animate-fade-in border-white/10">
+                <iframe
+                  width="100%"
+                  height="100%"
+                  style={{ border: 0 }}
+                  loading="lazy"
+                  allowFullScreen
+                  referrerPolicy="no-referrer-when-downgrade"
+                  src={`https://www.google.com/maps/embed/v1/search?key=${import.meta.env.VITE_GOOGLE_MAPS_KEY || ''}&q=${activeCategory === 'Historical' ? 'historical+places' : activeCategory.toLowerCase() + 's'}+in+${selectedCity === 'All' ? 'Uzbekistan' : selectedCity}&zoom=12`}
+                ></iframe>
+                
+                {/* Overlay for "No API Key" fallback - if no key is provided, we use a different public embed format */}
+                {!import.meta.env.VITE_GOOGLE_MAPS_KEY && (
+                  <iframe
+                    width="100%"
+                    height="100%"
+                    style={{ border: 0 }}
+                    src={`https://maps.google.com/maps?q=${activeCategory === 'Historical' ? 'historical+places' : activeCategory.toLowerCase() + 's'}+in+${selectedCity === 'All' ? 'Uzbekistan' : selectedCity}&t=&z=13&ie=UTF8&iwloc=&output=embed`}
+                    allowFullScreen
+                  ></iframe>
+                )}
               </div>
-              
-              {spots.filter(spot => spot.category === activeCategory && (selectedCity === 'All' || spot.city === selectedCity)).length === 0 && (
-                <div className="text-center py-20 glass-panel border-dashed border-white/10">
-                  <p className="text-muted italic">{t.notFound}</p>
-                </div>
-              )}
             </div>
           ) : activeTab === 'gps' ? (
             <div className="animate-fade-in">
