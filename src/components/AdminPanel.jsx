@@ -21,6 +21,28 @@ export default function AdminPanel({ nodes, onUpdateNodes, activeLang }) {
     ? 'http://localhost:5000' 
     : 'https://opentraveldataoptd-uzbekistan-api.onrender.com';
 
+  const adminTranslations = {
+    uz: {
+      title: "Boshqaruv Paneli", subtitle: "Baza ma'lumotlarini real vaqtda boshqarish",
+      addBtn: "Yangi nuqta", searchPlaceholder: "Shahar yoki kod bo'yicha...",
+      thType: "Turi", thCity: "Shahar (UZ/EN)", thCode: "Kod", thCoords: "Koordinatalar", thActions: "Amallar",
+      confirmDelete: "Haqiqatan ham ushbu ma'lumotni o'chirmoqchimisiz?", serverError: "Server bilan bog'lanishda xatolik!"
+    },
+    en: {
+      title: "Admin Dashboard", subtitle: "Manage database nodes in real-time",
+      addBtn: "Add New", searchPlaceholder: "Search city or code...",
+      thType: "Type", thCity: "City (UZ/EN)", thCode: "Code", thCoords: "Coordinates", thActions: "Actions",
+      confirmDelete: "Are you sure you want to delete this node?", serverError: "Error connecting to server!"
+    },
+    ru: {
+      title: "Панель управления", subtitle: "Управление узлами базы в реальном времени",
+      addBtn: "Добавить", searchPlaceholder: "Поиск по городам...",
+      thType: "Тип", thCity: "Город (УЗ/АНГ)", thCode: "Код", thCoords: "Координаты", thActions: "Действия",
+      confirmDelete: "Вы уверены, что хотите удалить этот узел?", serverError: "Ошибка подключения к серверу!"
+    }
+  };
+  const at = adminTranslations[activeLang] || adminTranslations.uz;
+
   const handleSave = async () => {
     try {
       const response = await fetch(`${API_URL}/api/nodes/${editingId}`, {
@@ -38,15 +60,15 @@ export default function AdminPanel({ nodes, onUpdateNodes, activeLang }) {
         setEditingId(null);
       } else {
         const err = await response.json();
-        alert(`Xatolik: ${err.error}`);
+        alert(`Error: ${err.error}`);
       }
     } catch (error) {
-      alert("Server bilan bog'lanishda xatolik!");
+      alert(at.serverError);
     }
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm("Haqiqatan ham ushbu ma'lumotni o'chirmoqchimisiz?")) {
+    if (window.confirm(at.confirmDelete)) {
       try {
         const response = await fetch(`${API_URL}/api/nodes/${id}`, {
           method: 'DELETE',
@@ -60,10 +82,10 @@ export default function AdminPanel({ nodes, onUpdateNodes, activeLang }) {
           onUpdateNodes(updatedNodes);
         } else {
           const err = await response.json();
-          alert(`Xatolik: ${err.error}`);
+          alert(`Error: ${err.error}`);
         }
       } catch (error) {
-        alert("Server bilan bog'lanishda xatolik!");
+        alert(at.serverError);
       }
     }
   };
@@ -74,12 +96,12 @@ export default function AdminPanel({ nodes, onUpdateNodes, activeLang }) {
         <div>
           <h2 className="text-2xl font-bold text-white flex items-center gap-3">
             <ShieldCheck className="text-cyan" />
-            Boshqaruv Paneli
+            {at.title}
           </h2>
-          <p className="text-muted text-sm mt-1">Baza ma'lumotlarini real vaqtda tahrirlash va boshqarish</p>
+          <p className="text-muted text-sm mt-1">{at.subtitle}</p>
         </div>
         <button className="btn-primary py-2.5 px-6 flex items-center gap-2 text-sm">
-          <Plus size={18} /> Yangi nuqta qo'shish
+          <Plus size={18} /> {at.addBtn}
         </button>
       </div>
 
@@ -87,7 +109,7 @@ export default function AdminPanel({ nodes, onUpdateNodes, activeLang }) {
         <Search size={20} className="text-muted" />
         <input 
           type="text" 
-          placeholder="Shahar, stansiya yoki kod bo'yicha qidirish..."
+          placeholder={at.searchPlaceholder}
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           className="bg-transparent border-none outline-none text-white w-full"
@@ -98,11 +120,11 @@ export default function AdminPanel({ nodes, onUpdateNodes, activeLang }) {
         <table className="w-full text-left border-collapse bg-[#0A0F1A]/40 backdrop-blur-xl">
           <thead>
             <tr className="border-b border-white/5 bg-white/5 text-xs uppercase tracking-widest text-muted">
-              <th className="px-6 py-4 font-semibold">Turi</th>
-              <th className="px-6 py-4 font-semibold">Shahar (UZ/EN)</th>
-              <th className="px-6 py-4 font-semibold">Kod (IATA)</th>
-              <th className="px-6 py-4 font-semibold">Koordinatalar</th>
-              <th className="px-6 py-4 font-semibold text-right">Amallar</th>
+              <th className="px-6 py-4 font-semibold">{at.thType}</th>
+              <th className="px-6 py-4 font-semibold">{at.thCity}</th>
+              <th className="px-6 py-4 font-semibold">{at.thCode}</th>
+              <th className="px-6 py-4 font-semibold">{at.thCoords}</th>
+              <th className="px-6 py-4 font-semibold text-right">{at.thActions}</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-white/5">
@@ -158,17 +180,17 @@ export default function AdminPanel({ nodes, onUpdateNodes, activeLang }) {
                     <div className="space-y-1">
                       <input 
                         className="bg-white/5 border border-white/10 rounded px-2 py-0.5 w-full outline-none"
-                        value={editForm.coordinates?.lat || ''}
-                        onChange={e => setEditForm({...editForm, coordinates: {...editForm.coordinates, lat: e.target.value}})}
+                        value={editForm.latitude || ''}
+                        onChange={e => setEditForm({...editForm, latitude: e.target.value})}
                       />
                       <input 
                         className="bg-white/5 border border-white/10 rounded px-2 py-0.5 w-full outline-none"
-                        value={editForm.coordinates?.lon || ''}
-                        onChange={e => setEditForm({...editForm, coordinates: {...editForm.coordinates, lon: e.target.value}})}
+                        value={editForm.longitude || ''}
+                        onChange={e => setEditForm({...editForm, longitude: e.target.value})}
                       />
                     </div>
                   ) : (
-                    node.coordinates ? `${node.coordinates.lat}, ${node.coordinates.lon}` : 'N/A'
+                    node.latitude ? `${node.latitude}, ${node.longitude}` : 'N/A'
                   )}
                 </td>
                 <td className="px-6 py-4 text-right">

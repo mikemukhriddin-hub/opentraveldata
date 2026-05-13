@@ -94,6 +94,25 @@ function App() {
     return node.name_uz; // default uz
   };
 
+  const translations = {
+    uz: { 
+      discover: "Katalog", routes: "Yo'nalishlar", gps: "Hududlar (GPS)", admin: "Boshqaruv",
+      signIn: "Tizimga kirish", signOut: "Chiqish", searchPlaceholder: "Shahar, stansiya nomi bo'yicha qidiring...",
+      title: "O'zbekiston Ochiq Ma'lumotlar platformasi"
+    },
+    en: { 
+      discover: "Discover", routes: "Routes", gps: "Regions (GPS)", admin: "Management",
+      signIn: "Sign In", signOut: "Log Out", searchPlaceholder: "Search by city, station name...",
+      title: "Uzbekistan Open Data Platform"
+    },
+    ru: { 
+      discover: "Каталог", routes: "Маршруты", gps: "Регионы (GPS)", admin: "Управление",
+      signIn: "Войти", signOut: "Выйти", searchPlaceholder: "Поиск по городам, вокзалам...",
+      title: "Платформа открытых данных Узбекистана"
+    }
+  };
+  const t = translations[activeLang] || translations.uz;
+
   return (
     <div className="flex min-h-screen">
       {/* Sidebar Overlay (For desktop, static sidebar) */}
@@ -114,19 +133,19 @@ function App() {
             className={`flex items-center gap-3 p-3 rounded-xl transition-all ${activeTab === 'discover' && currentView === 'home' ? 'bg-white/5 text-cyan border border-white/10' : 'text-muted hover:text-white hover:bg-white/5'}`}
           >
             <Globe size={20} />
-            <span className="font-medium">Katalog</span>
+            <span className="font-medium">{t.discover}</span>
           </button>
           <button 
             onClick={() => { setActiveTab('routes'); setCurrentView('home'); }}
             className={`flex items-center gap-3 p-3 rounded-xl transition-all ${activeTab === 'routes' && currentView === 'home' ? 'bg-white/5 text-cyan border border-white/10' : 'text-muted hover:text-white hover:bg-white/5'}`}
           >
             <PlaneTakeoff size={20} />
-            <span className="font-medium">Yo'nalishlar</span>
+            <span className="font-medium">{t.routes}</span>
           </button>
           <div className="h-px bg-white/5 my-2"></div>
           <a href="#" className="flex items-center gap-3 p-3 rounded-xl text-muted hover:text-white hover:bg-white/5 transition-all">
             <MapPin size={20} />
-            <span className="font-medium">Hududlar (GPS)</span>
+            <span className="font-medium">{t.gps}</span>
           </a>
           
           {user && (
@@ -135,7 +154,7 @@ function App() {
               className={`flex items-center gap-3 p-3 rounded-xl transition-all mt-4 border border-cyan/20 ${currentView === 'admin' ? 'bg-cyan/10 text-cyan shadow-[0_0_15px_rgba(0,229,255,0.2)]' : 'bg-white/5 text-muted hover:text-white hover:bg-white/10'}`}
             >
               <Shield size={20} />
-              <span className="font-medium">Boshqaruv</span>
+              <span className="font-medium">{t.admin}</span>
             </button>
           )}
         </nav>
@@ -180,7 +199,7 @@ function App() {
                   onClick={() => setUser(null)}
                   className="text-xs text-muted hover:text-red-400 transition ml-2"
                 >
-                  Chiqish
+                  {t.signOut}
                 </button>
               </div>
             ) : (
@@ -189,7 +208,7 @@ function App() {
                   <User size={14} className="text-black" />
                 </div>
                 <span className="text-sm font-medium pr-1">
-                  {activeLang === 'uz' ? 'Tizimga kirish' : activeLang === 'en' ? 'Sign In' : 'Войти'}
+                  {t.signIn}
                 </span>
               </button>
             )}
@@ -200,13 +219,11 @@ function App() {
         <div className="pt-12 px-6 md:px-10 max-w-5xl mx-auto w-full relative z-10 flex-none animate-fade-in">
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-64 bg-cyan/10 blur-[100px] rounded-full -z-10"></div>
           
-          <h1 className="text-4xl md:text-5xl font-bold mb-4 tracking-tight text-center">
+          <h1 className="text-4xl md:text-5xl font-black text-center mb-4 tracking-tighter animate-fade-in-up">
             Open Travel Data <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan to-blue-400">Uzbekistan</span>
           </h1>
           <p className="text-muted text-center max-w-2xl mx-auto mb-10">
-            {activeLang === 'uz' && "O'zbekistonning barcha transport nuqtalari, IATA/ICAO kodlari va xalqaro ochiq ma'lumotlar bazasi."}
-            {activeLang === 'en' && "Centralized database for all transport nodes, IATA/ICAO codes in Uzbekistan."}
-            {activeLang === 'ru' && "Единая база транспортных узлов, кодов IATA/ICAO и открытых данных Узбекистана."}
+            {t.title}
           </p>
 
           {/* Search Bar */}
@@ -218,7 +235,7 @@ function App() {
               </div>
               <input
                 type="text"
-                placeholder={activeLang === 'uz' ? "Shahar, stansiya nomi, yoki TAS kodi bo'yicha qidiring..." : "Search by city, station name, or IATA code..."}
+                placeholder={t.searchPlaceholder}
                 className="bg-transparent border-none outline-none text-white w-full py-4 px-2 text-lg placeholder:text-muted/60"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
