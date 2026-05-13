@@ -17,16 +17,50 @@ export default function AdminPanel({ nodes, onUpdateNodes, activeLang }) {
     setEditForm({ ...node });
   };
 
-  const handleSave = () => {
-    const updatedNodes = nodes.map(n => n.id === editingId ? editForm : n);
-    onUpdateNodes(updatedNodes);
-    setEditingId(null);
+  const handleSave = async () => {
+    try {
+      const response = await fetch(`http://localhost:5000/api/nodes/${editingId}`, {
+        method: 'PUT',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${user?.token}`
+        },
+        body: JSON.stringify(editForm)
+      });
+      
+      if (response.ok) {
+        const updatedNodes = nodes.map(n => n.id === editingId ? editForm : n);
+        onUpdateNodes(updatedNodes);
+        setEditingId(null);
+      } else {
+        const err = await response.json();
+        alert(`Xatolik: ${err.error}`);
+      }
+    } catch (error) {
+      alert("Server bilan bog'lanishda xatolik!");
+    }
   };
 
-  const handleDelete = (id) => {
+  const handleDelete = async (id) => {
     if (window.confirm("Haqiqatan ham ushbu ma'lumotni o'chirmoqchimisiz?")) {
-      const updatedNodes = nodes.filter(n => n.id !== id);
-      onUpdateNodes(updatedNodes);
+      try {
+        const response = await fetch(`http://localhost:5000/api/nodes/${id}`, {
+          method: 'DELETE',
+          headers: { 
+            'Authorization': `Bearer ${user?.token}`
+          }
+        });
+
+        if (response.ok) {
+          const updatedNodes = nodes.filter(n => n.id !== id);
+          onUpdateNodes(updatedNodes);
+        } else {
+          const err = await response.json();
+          alert(`Xatolik: ${err.error}`);
+        }
+      } catch (error) {
+        alert("Server bilan bog'lanishda xatolik!");
+      }
     }
   };
 

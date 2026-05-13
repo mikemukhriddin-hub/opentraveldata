@@ -21,8 +21,15 @@ function App() {
   const [routeResults, setRouteResults] = useState(null);
 
   useEffect(() => {
-    // Automatically load nodes from JSON
-    setNodes(transportNodes);
+    // Backend API orqali ma'lumotlarni yuklash
+    fetch('http://localhost:5000/api/nodes')
+      .then(res => res.json())
+      .then(data => setNodes(data))
+      .catch(err => {
+        console.error('Data fetch error:', err);
+        // Xatolik bo'lsa JSON dan backup olish
+        setNodes(transportNodes);
+      });
   }, []);
 
   const handleCalculateRoute = () => {
@@ -218,6 +225,7 @@ function App() {
               nodes={nodes} 
               onUpdateNodes={setNodes} 
               activeLang={activeLang} 
+              user={user}
             />
           ) : activeTab === 'routes' ? (
             <div className="animate-fade-in">

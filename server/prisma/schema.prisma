@@ -1,0 +1,33 @@
+// server/prisma/schema.prisma
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model TransportNode {
+  id          Int      @id @default(autoincrement())
+  type        String   // 'A' for Airport, 'R' for Railway
+  name_uz     String
+  name_en     String
+  name_ru     String?
+  iata_code   String?
+  locode      String?
+  region      String
+  lat         Float?
+  lon         Float?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model User {
+  id        String   @id // Google ID
+  email     String   @unique
+  name      String
+  picture   String?
+  role      String   @default("user") // 'admin' or 'user'
+  createdAt DateTime @default(now())
+}

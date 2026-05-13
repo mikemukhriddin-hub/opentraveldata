@@ -15,7 +15,8 @@ export default function AuthModal({ isOpen, onClose, onLogin, activeLang }) {
       method: 'google', 
       badge: '✅ Google Verified',
       photo: decoded.picture,
-      email: decoded.email
+      email: decoded.email,
+      token: credentialResponse.credential
     });
     onClose();
   };
