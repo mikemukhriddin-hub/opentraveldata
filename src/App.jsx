@@ -605,21 +605,16 @@ function App() {
                   <p className="text-muted text-sm">{nodes.filter(n=>n.type==='R').length} {t.railDesc}</p>
                 </div>
 
-                <div 
-                  onClick={(e) => { 
-                    e.stopPropagation();
-                    setSearchQuery(''); 
-                    setActiveTab('tourism'); 
-                    setActiveCategory('Historical'); 
-                  }}
-                  className="glass-panel p-6 group cursor-pointer hover:-translate-y-1 active:scale-95 transition-all duration-300 border border-purple-500/10 hover:border-purple-500/30 select-none w-full text-left"
+                <button 
+                  onClick={() => { setSearchQuery(''); setActiveTab('tourism'); setActiveCategory('Historical'); }}
+                  className="glass-panel p-6 group cursor-pointer hover:-translate-y-1 transition-transform duration-300 border border-purple-500/10 hover:border-purple-500/30 text-left w-full"
                 >
-                  <div className="w-12 h-12 rounded-xl bg-purple-500/10 flex items-center justify-center text-purple-400 mb-4 group-hover:scale-110 transition-transform pointer-events-none">
+                  <div className="w-12 h-12 rounded-xl bg-purple-500/10 flex items-center justify-center text-purple-400 mb-4 group-hover:scale-110 transition-transform">
                     <Globe size={24} />
                   </div>
-                  <h3 className="text-xl font-bold mb-2 pointer-events-none">{t.multiLangBox}</h3>
-                  <p className="text-muted text-sm pointer-events-none">{t.multiLangDesc}</p>
-                </div>
+                  <h3 className="text-xl font-bold mb-2">{t.multiLangBox}</h3>
+                  <p className="text-muted text-sm">{t.multiLangDesc}</p>
+                </button>
               </div>
             </div>
           )}
