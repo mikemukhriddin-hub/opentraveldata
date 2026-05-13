@@ -34,9 +34,8 @@ function App() {
       })
       .then(data => setNodes(data))
       .catch(err => {
-        console.error('Data fetch error:', err);
-        setError(err.message);
-        // Xatolik bo'lsa JSON dan backup olish
+        console.error('Data fetch error. Using local backup JSON:', err);
+        // Xatolik bo'lsa JSON dan backup olish (hech qanday xatolik ekrani chiqarmaymiz)
         setNodes(transportNodes);
       });
   }, []);
