@@ -44,7 +44,8 @@ app.get('/api/nodes', async (req, res) => {
     const nodes = await prisma.transportNode.findMany();
     res.json(nodes);
   } catch (error) {
-    res.status(500).json({ error: 'Xatolik yuz berdi' });
+    console.error('API Error (GET /nodes):', error);
+    res.status(500).json({ error: error.message || 'Xatolik yuz berdi' });
   }
 });
 

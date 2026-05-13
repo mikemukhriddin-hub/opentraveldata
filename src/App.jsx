@@ -27,10 +27,14 @@ function App() {
       : 'https://opentraveldataoptd-uzbekistan-api.onrender.com';
 
     fetch(`${API_URL}/api/nodes`)
-      .then(res => res.json())
+      .then(res => {
+        if (!res.ok) throw new Error("Serverdan ma'lumot olishda xatolik yuz berdi");
+        return res.json();
+      })
       .then(data => setNodes(data))
       .catch(err => {
         console.error('Data fetch error:', err);
+        setError(err.message);
         // Xatolik bo'lsa JSON dan backup olish
         setNodes(transportNodes);
       });
@@ -224,7 +228,21 @@ function App() {
 
         {/* Content Section (Results or Dashboard or Routes or Admin) */}
         <main className="flex-1 px-6 md:px-10 pb-10 max-w-5xl mx-auto w-full mt-10">
-          {currentView === 'admin' ? (
+          {error ? (
+            <div className="flex flex-col items-center justify-center py-20 glass-panel border-red-500/20 bg-red-500/5 animate-fade-in">
+              <div className="w-16 h-16 rounded-full bg-red-500/20 flex items-center justify-center text-red-500 mb-6">
+                <X size={32} />
+              </div>
+              <h2 className="text-xl font-bold text-white mb-2">Ma'lumotlarni yuklashda xatolik</h2>
+              <p className="text-muted text-center max-w-md mb-8">{error}</p>
+              <button 
+                onClick={() => window.location.reload()}
+                className="px-8 py-3 bg-white/10 hover:bg-white/20 text-white rounded-xl transition-all font-medium"
+              >
+                Qayta urinish
+              </button>
+            </div>
+          ) : currentView === 'admin' ? (
             <AdminPanel 
               nodes={nodes} 
               onUpdateNodes={setNodes} 
