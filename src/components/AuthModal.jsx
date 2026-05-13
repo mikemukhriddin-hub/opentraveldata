@@ -4,8 +4,7 @@ import { GoogleLogin, GoogleOAuthProvider } from '@react-oauth/google';
 import { jwtDecode } from 'jwt-decode';
 
 export default function AuthModal({ isOpen, onClose, onLogin, activeLang }) {
-  // GOOGLE_CLIENT_ID ni keyinchalik .env fayliga yoki Vercel sozlamalariga qo'yasiz
-  const GOOGLE_CLIENT_ID = "YOUR_GOOGLE_CLIENT_ID_HERE"; 
+  const GOOGLE_CLIENT_ID = "537847200262-hq34j23mb8hkacfgjmle6m272oplr7sa.apps.googleusercontent.com"; 
 
   const handleSuccess = (credentialResponse) => {
     const decoded = jwtDecode(credentialResponse.credential);
