@@ -21,8 +21,12 @@ function App() {
   const [routeResults, setRouteResults] = useState(null);
 
   useEffect(() => {
-    // Backend API orqali ma'lumotlarni yuklash
-    fetch('http://localhost:5000/api/nodes')
+    // Backend API manzilini aniqlash
+    const API_URL = window.location.hostname === 'localhost' 
+      ? 'http://localhost:5000' 
+      : 'https://opentraveldataoptd-uzbekistan-api.onrender.com';
+
+    fetch(`${API_URL}/api/nodes`)
       .then(res => res.json())
       .then(data => setNodes(data))
       .catch(err => {

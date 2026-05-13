@@ -17,9 +17,13 @@ export default function AdminPanel({ nodes, onUpdateNodes, activeLang }) {
     setEditForm({ ...node });
   };
 
+  const API_URL = window.location.hostname === 'localhost' 
+    ? 'http://localhost:5000' 
+    : 'https://opentraveldataoptd-uzbekistan-api.onrender.com';
+
   const handleSave = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/api/nodes/${editingId}`, {
+      const response = await fetch(`${API_URL}/api/nodes/${editingId}`, {
         method: 'PUT',
         headers: { 
           'Content-Type': 'application/json',
@@ -44,7 +48,7 @@ export default function AdminPanel({ nodes, onUpdateNodes, activeLang }) {
   const handleDelete = async (id) => {
     if (window.confirm("Haqiqatan ham ushbu ma'lumotni o'chirmoqchimisiz?")) {
       try {
-        const response = await fetch(`http://localhost:5000/api/nodes/${id}`, {
+        const response = await fetch(`${API_URL}/api/nodes/${id}`, {
           method: 'DELETE',
           headers: { 
             'Authorization': `Bearer ${user?.token}`
