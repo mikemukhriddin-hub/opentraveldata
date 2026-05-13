@@ -182,6 +182,19 @@ export default function AuthModal({ isOpen, onClose, onLogin, activeLang }) {
               </div>
               <div className="absolute -inset-1 bg-cyan/10 blur-xl rounded-2xl -z-10 group-hover:bg-cyan/20 transition-all"></div>
             </div>
+
+            <div className="text-center">
+              <button 
+                onClick={() => {
+                  if (window.confirm("Telegram tugmasi ishlamayaptimi? Test rejimi orqali kirishni xohlaysizmi?")) {
+                    handleSimulateLogin('tg');
+                  }
+                }}
+                className="text-[10px] text-muted hover:text-cyan transition-colors"
+              >
+                Tugma ishlamayaptimi? Muammoni hal qilish
+              </button>
+            </div>
             
             <button 
               onClick={() => setAuthStep('phone')}
