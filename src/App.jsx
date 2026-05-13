@@ -431,27 +431,15 @@ function App() {
                 </div>
               </div>
 
-              <div className="glass-panel overflow-hidden h-[600px] relative animate-fade-in border-white/10">
+              <div className="glass-panel overflow-hidden h-[600px] relative animate-fade-in border-white/10 shadow-2xl">
                 <iframe
                   width="100%"
                   height="100%"
                   style={{ border: 0 }}
-                  loading="lazy"
+                  src={`https://maps.google.com/maps?q=${activeCategory === 'Historical' ? 'museums+and+historical+places' : activeCategory.toLowerCase() + 's'}+in+${selectedCity === 'All' ? 'Uzbekistan' : selectedCity}&t=&z=13&ie=UTF8&iwloc=&output=embed`}
                   allowFullScreen
-                  referrerPolicy="no-referrer-when-downgrade"
-                  src={`https://www.google.com/maps/embed/v1/search?key=${import.meta.env.VITE_GOOGLE_MAPS_KEY || ''}&q=${activeCategory === 'Historical' ? 'historical+places' : activeCategory.toLowerCase() + 's'}+in+${selectedCity === 'All' ? 'Uzbekistan' : selectedCity}&zoom=12`}
+                  loading="lazy"
                 ></iframe>
-                
-                {/* Overlay for "No API Key" fallback - if no key is provided, we use a different public embed format */}
-                {!import.meta.env.VITE_GOOGLE_MAPS_KEY && (
-                  <iframe
-                    width="100%"
-                    height="100%"
-                    style={{ border: 0 }}
-                    src={`https://maps.google.com/maps?q=${activeCategory === 'Historical' ? 'historical+places' : activeCategory.toLowerCase() + 's'}+in+${selectedCity === 'All' ? 'Uzbekistan' : selectedCity}&t=&z=13&ie=UTF8&iwloc=&output=embed`}
-                    allowFullScreen
-                  ></iframe>
-                )}
               </div>
             </div>
           ) : activeTab === 'gps' ? (
