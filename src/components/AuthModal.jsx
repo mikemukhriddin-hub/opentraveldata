@@ -1,194 +1,84 @@
-import React, { useState, useEffect } from 'react';
-import { X, Phone, MessageCircle, Code, Mail, ArrowRight, ShieldCheck } from 'lucide-react';
+import React, { useState } from 'react';
+import { X, ShieldCheck, Mail } from 'lucide-react';
+import { GoogleLogin, GoogleOAuthProvider } from '@react-oauth/google';
+import { jwtDecode } from 'jwt-decode';
 
 export default function AuthModal({ isOpen, onClose, onLogin, activeLang }) {
-  const [authStep, setAuthStep] = useState('select'); 
-  const [phone, setPhone] = useState('+998 ');
-  const [smsCode, setSmsCode] = useState('');
-  const [generatedCode, setGeneratedCode] = useState(null);
-  const [isSending, setIsSending] = useState(false);
+  // GOOGLE_CLIENT_ID ni keyinchalik .env fayliga yoki Vercel sozlamalariga qo'yasiz
+  const GOOGLE_CLIENT_ID = "YOUR_GOOGLE_CLIENT_ID_HERE"; 
 
-  // 1. Global callbackni tashqarida e'lon qilamiz
-  useEffect(() => {
-    window.onTelegramAuth = (user) => {
-      console.log('Telegram Auth Success:', user);
-      onLogin({ 
-        name: user.username || user.first_name, 
-        method: 'tg', 
-        badge: '✅ Verified via Telegram',
-        photo: user.photo_url 
-      });
-      onClose();
-    };
-  }, [onLogin, onClose]);
-
-  const handleSimulateLogin = (method, code = null) => {
-    if (method === 'sms') {
-      if (code === generatedCode) {
-        onLogin({ name: phone, method: 'phone', badge: '📱 Verified Phone' });
-        onClose();
-      } else {
-        alert("Xato kod! Qayta urinib ko'ring");
-        return;
-      }
-    } else {
-      onLogin({ name: method === 'tg' ? 'Azizbek_Dev' : 'DeveloperUser', method, badge: '🌟 Contributor' });
-      onClose();
-    }
+  const handleSuccess = (credentialResponse) => {
+    const decoded = jwtDecode(credentialResponse.credential);
+    console.log('Google User:', decoded);
+    
+    onLogin({ 
+      name: decoded.name, 
+      method: 'google', 
+      badge: '✅ Google Verified',
+      photo: decoded.picture,
+      email: decoded.email
+    });
+    onClose();
   };
 
-  const sendSmsCode = async () => {
-    if (phone.length < 13) {
-      alert("Telefon raqamingizni to'liq kiriting!");
-      return;
-    }
-    setIsSending(true);
-    const code = Math.floor(10000 + Math.random() * 90000).toString();
-    setGeneratedCode(code);
-    setSmsCode('');
-
-    try {
-      await fetch('/api/send-sms', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone, code })
-      });
-      setTimeout(() => {
-        setIsSending(false);
-        setAuthStep('sms');
-      }, 1000);
-    } catch (error) {
-      setIsSending(false);
-      setAuthStep('sms');
-    }
+  const handleError = () => {
+    console.log('Login Failed');
+    alert("Google orqali kirishda xatolik yuz berdi!");
   };
-
-  useEffect(() => {
-    if (authStep === 'select' && isOpen) {
-      // 2. Scriptni faqat bitta marta yuklash
-      const container = document.getElementById('telegram-login-container');
-      if (container) {
-        container.innerHTML = '';
-        const script = document.createElement('script');
-        script.src = "https://telegram.org/js/telegram-widget.js?22";
-        script.setAttribute('data-telegram-login', "optd_login_bot");
-        script.setAttribute('data-size', "large");
-        script.setAttribute('data-radius', "12");
-        script.setAttribute('data-onauth', "onTelegramAuth");
-        script.setAttribute('data-request-access', "write");
-        script.async = true;
-        container.appendChild(script);
-      }
-    }
-  }, [authStep, isOpen]);
 
   const texts = {
-    uz: { title: "Tizimga kirish", desc: "O'zbekiston Ochiq Ma'lumotlar platformasiga xush kelibsiz", smsBtn: "SMS orqali kirish (+998)", devTitle: "Dasturchilar uchun", phoneTitle: "Telefon raqamingiz", sendSms: "SMS kod yuborish", smsTitle: "SMS kodni kiriting", verifySms: "Tasdiqlash", back: "Orqaga" },
-    en: { title: "Sign In", desc: "Welcome to Uzbekistan Open Data Platform", smsBtn: "Login via SMS (+998)", devTitle: "For Developers", phoneTitle: "Your Phone Number", sendSms: "Send SMS Code", smsTitle: "Enter SMS Code", verifySms: "Verify", back: "Back" },
-    ru: { title: "Войти", desc: "Добро пожаловать в платформу открытых данных", smsBtn: "Вход по SMS (+998)", devTitle: "Для разработчиков", phoneTitle: "Ваш номер телефона", sendSms: "Отправить SMS код", smsTitle: "Введите SMS код", verifySms: "Подтвердить", back: "Назад" }
+    uz: { title: "Tizimga kirish", desc: "Google hisobingiz orqali bir marta bosish bilan kiring", back: "Orqaga" },
+    en: { title: "Sign In", desc: "Sign in with your Google account in one click", back: "Back" },
+    ru: { title: "Войти", desc: "Войдите через свой Google аккаунт в один клик", back: "Назад" }
   };
   const t = texts[activeLang] || texts.uz;
 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-black/70 backdrop-blur-md" onClick={onClose}></div>
-      <div className="relative w-full max-w-md glass-panel p-8 border border-white/20 shadow-[0_0_50px_rgba(0,229,255,0.15)] bg-[#0A0F1A]/90 animate-fade-in">
-        <button onClick={onClose} className="absolute top-4 right-4 text-muted hover:text-white transition bg-white/5 hover:bg-white/10 p-2 rounded-full">
-          <X size={20} />
-        </button>
+    <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
+      <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+        <div className="absolute inset-0 bg-black/70 backdrop-blur-md" onClick={onClose}></div>
+        <div className="relative w-full max-w-md glass-panel p-10 border border-white/20 shadow-[0_0_50px_rgba(0,229,255,0.15)] bg-[#0A0F1A]/95 animate-fade-in rounded-[32px]">
+          <button onClick={onClose} className="absolute top-6 right-6 text-muted hover:text-white transition bg-white/5 hover:bg-white/10 p-2 rounded-full">
+            <X size={20} />
+          </button>
 
-        <div className="text-center mb-8">
-          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-cyan/20 to-blue-500/20 flex items-center justify-center text-cyan mx-auto mb-4 shadow-[0_0_20px_rgba(0,229,255,0.2)] border border-cyan/30">
-            <ShieldCheck size={32} />
+          <div className="text-center mb-10">
+            <div className="w-20 h-20 rounded-[24px] bg-gradient-to-br from-cyan/20 to-blue-500/20 flex items-center justify-center text-cyan mx-auto mb-6 shadow-[0_0_30px_rgba(0,229,255,0.2)] border border-cyan/30">
+              <ShieldCheck size={40} />
+            </div>
+            <h2 className="text-3xl font-bold mb-3 tracking-tight">{t.title}</h2>
+            <p className="text-muted text-sm leading-relaxed max-w-[250px] mx-auto">{t.desc}</p>
           </div>
-          <h2 className="text-2xl font-bold mb-2">{t.title}</h2>
-          <p className="text-muted text-sm">{t.desc}</p>
-        </div>
 
-        {authStep === 'select' && (
-          <div className="space-y-6">
-            <div className="relative group p-[2px] rounded-2xl bg-gradient-to-r from-transparent via-cyan/30 to-transparent hover:via-cyan/60 transition-all duration-500">
-              <div id="telegram-login-container" className="relative w-full flex justify-center py-4 bg-[#0A0F1A]/80 backdrop-blur-xl rounded-[14px] border border-white/5 shadow-inner min-h-[80px]">
-                <div className="animate-pulse text-muted text-xs">Telegram bog'lanmoqda...</div>
-              </div>
-              <div className="absolute -inset-1 bg-cyan/10 blur-xl rounded-2xl -z-10 group-hover:bg-cyan/20 transition-all"></div>
-            </div>
-
-            <div className="text-center">
-              <button onClick={() => { if (window.confirm("Simulyatsiya rejimi bilan kirmoqchimisiz?")) handleSimulateLogin('tg'); }} className="text-[10px] text-muted hover:text-cyan transition-colors">
-                Tugma ishlamayaptimi? Muammoni hal qilish
-              </button>
-            </div>
-            
-            <button onClick={() => setAuthStep('phone')} className="w-full flex items-center justify-center gap-3 bg-white/5 hover:bg-white/10 border border-white/10 text-white py-4 rounded-2xl font-medium transition-all group">
-              <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center group-hover:bg-white/10"><Phone size={18} className="text-muted group-hover:text-white" /></div>
-              {t.smsBtn}
-            </button>
-
-            <div className="py-4 flex items-center gap-4 text-muted text-xs uppercase tracking-wider">
-              <div className="flex-1 h-px bg-white/10"></div>{t.devTitle}<div className="flex-1 h-px bg-white/10"></div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <button onClick={() => handleSimulateLogin('github')} className="flex items-center justify-center gap-2 bg-[#24292e] hover:bg-[#1b1f23] text-white py-2.5 rounded-xl text-sm font-medium transition-colors"><Code size={18} /> GitHub</button>
-              <button onClick={() => handleSimulateLogin('google')} className="flex items-center justify-center gap-2 bg-white/5 hover:bg-white/10 border border-white/10 text-white py-2.5 rounded-xl text-sm font-medium transition-colors"><Mail size={18} /> Google</button>
-            </div>
-          </div>
-        )}
-
-        {authStep === 'phone' && (
-          <div className="space-y-5 animate-fade-in">
-            <div>
-              <label className="block text-sm font-medium text-muted mb-2">{t.phoneTitle}</label>
-              <div className="flex items-center bg-[#070B14] border border-white/10 rounded-xl px-4 py-1 focus-within:border-cyan">
-                <span className="text-muted mr-2">🇺🇿</span>
-                <input type="text" value={phone} onChange={(e) => setPhone(e.target.value)} className="w-full bg-transparent py-3 text-white outline-none font-mono text-lg" autoFocus />
+          <div className="space-y-8">
+            <div className="flex justify-center relative group">
+              <div className="absolute -inset-1 bg-gradient-to-r from-cyan/50 to-blue-500/50 rounded-lg blur opacity-25 group-hover:opacity-100 transition duration-1000 group-hover:duration-200"></div>
+              <div className="relative w-full flex justify-center">
+                <GoogleLogin
+                  onSuccess={handleSuccess}
+                  onError={handleError}
+                  useOneTap
+                  theme="filled_black"
+                  shape="pill"
+                  width="100%"
+                />
               </div>
             </div>
-            <button onClick={sendSmsCode} disabled={isSending} className="w-full btn-primary py-3.5 flex items-center justify-center gap-2 shadow-[0_4px_20px_rgba(0,229,255,0.3)] disabled:opacity-50">
-              {isSending ? 'Yuborilmoqda...' : t.sendSms} <ArrowRight size={18} />
-            </button>
-            <button onClick={() => setAuthStep('select')} className="w-full text-sm text-muted hover:text-white transition py-2">{t.back}</button>
-          </div>
-        )}
 
-        {authStep === 'sms' && (
-          <div className="space-y-6 animate-fade-in">
-            <div className="text-center">
-              <label className="block text-sm font-medium text-muted mb-2">{t.smsTitle}</label>
-              <p className="text-xs text-cyan mb-8">{phone} raqamiga tasdiqlash kodi yuborildi</p>
-              <div className="flex gap-3 justify-center mb-8">
-                {[0, 1, 2, 3, 4].map((index) => (
-                  <input key={index} id={`otp-${index}`} type="text" maxLength={1} value={smsCode[index] || ''} onChange={(e) => {
-                    const val = e.target.value.replace(/[^0-9]/g, '');
-                    if (val) {
-                      const newCode = smsCode.split(''); newCode[index] = val; setSmsCode(newCode.join(''));
-                      if (index < 4) document.getElementById(`otp-${index + 1}`).focus();
-                    }
-                  }} onKeyDown={(e) => { if (e.key === 'Backspace' && !smsCode[index] && index > 0) document.getElementById(`otp-${index - 1}`).focus(); }}
-                  className="w-12 h-14 bg-[#070B14] border border-white/10 rounded-xl text-center text-2xl font-bold text-white outline-none focus:border-cyan focus:shadow-[0_0_15px_rgba(0,229,255,0.2)] transition-all" />
-                ))}
-              </div>
-              {generatedCode && (
-                <div className="mb-4 p-2 bg-cyan/5 border border-cyan/20 rounded-lg animate-pulse">
-                  <p className="text-[10px] text-cyan uppercase tracking-widest font-bold">Test kodi:</p>
-                  <p className="text-xl font-mono text-white tracking-[0.5em]">{generatedCode}</p>
-                </div>
-              )}
+            <div className="flex items-center gap-4 text-muted text-[10px] uppercase tracking-[0.2em]">
+              <div className="flex-1 h-px bg-white/5"></div>
+              Xavfsiz ulanish
+              <div className="flex-1 h-px bg-white/5"></div>
             </div>
-            <button onClick={() => { if (smsCode.length === 5) handleSimulateLogin('sms', smsCode); else alert("Iltimos, 5 xonali kodni to'liq kiriting!"); }} className="w-full btn-primary py-4 shadow-[0_4px_20px_rgba(0,229,255,0.3)] font-semibold tracking-wide">
-              {t.verifySms}
-            </button>
-            <button onClick={() => setAuthStep('phone')} className="w-full text-sm text-muted hover:text-white transition py-2 text-center">{t.back}</button>
           </div>
-        )}
 
-        <div className="mt-8 text-center text-[10px] text-muted/50 max-w-xs mx-auto leading-relaxed">
-          Tizimga kirish orqali siz loyihaning CC-BY litsenziyasi ostida ochiq hissa qo'shish qoidalariga rozilik bildirasiz.
+          <div className="mt-10 text-center text-[10px] text-muted/40 leading-relaxed italic">
+            "Google orqali kirish" xizmati ma'lumotlaringiz maxfiyligini 100% kafolatlaydi.
+          </div>
         </div>
       </div>
-    </div>
+    </GoogleOAuthProvider>
   );
 }
