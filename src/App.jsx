@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Search, MapPin, Globe, PlaneTakeoff, Train, Activity, Menu, Bell, User, Star, ChevronRight, Edit2, Shield } from 'lucide-react';
+import { Search, MapPin, Globe, PlaneTakeoff, Train, Activity, Menu, Bell, User, Star, ChevronRight, Edit2, Shield, X } from 'lucide-react';
 import transportNodes from './data/transport_nodes.json';
 import AuthModal from './components/AuthModal';
 import EditModal from './components/EditModal';
@@ -9,6 +9,7 @@ import AdminPanel from './components/AdminPanel';
 function App() {
   const [searchQuery, setSearchQuery] = useState('');
   const [nodes, setNodes] = useState([]);
+  const [error, setError] = useState(null);
   const [activeLang, setActiveLang] = useState('uz'); // uz, en, ru
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [user, setUser] = useState(null);
