@@ -93,6 +93,56 @@ app.delete('/api/nodes/:id', isAdmin, async (req, res) => {
   }
 });
 
+// --- Tourist Spots Endpoints ---
+
+// 5. Barcha turistik joylarni olish (Filter bilan)
+app.get('/api/spots', async (req, res) => {
+  const { category, city } = req.query;
+  try {
+    const where = {};
+    if (category) where.category = category;
+    if (city) where.city = city;
+    
+    const spots = await prisma.touristSpot.findMany({ where });
+    res.json(spots);
+  } catch (error) {
+    res.status(500).json({ error: 'Ma\'lumotlarni olishda xatolik' });
+  }
+});
+
+// 6. Yangi joy qo'shish (Faqat Admin)
+app.post('/api/spots', isAdmin, async (req, res) => {
+  try {
+    const newSpot = await prisma.touristSpot.create({ data: req.body });
+    res.json(newSpot);
+  } catch (error) {
+    res.status(500).json({ error: 'Qo\'shishda xatolik' });
+  }
+});
+
+// 7. Joyni tahrirlash (Faqat Admin)
+app.put('/api/spots/:id', isAdmin, async (req, res) => {
+  try {
+    const updated = await prisma.touristSpot.update({
+      where: { id: parseInt(req.params.id) },
+      data: req.body
+    });
+    res.json(updated);
+  } catch (error) {
+    res.status(500).json({ error: 'Tahrirlashda xatolik' });
+  }
+});
+
+// 8. Joyni o'chirish (Faqat Admin)
+app.delete('/api/spots/:id', isAdmin, async (req, res) => {
+  try {
+    await prisma.touristSpot.delete({ where: { id: parseInt(req.params.id) } });
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: 'O\'chirishda xatolik' });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });

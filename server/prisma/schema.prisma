@@ -31,3 +31,23 @@ model User {
   role      String   @default("user") // 'admin' or 'user'
   createdAt DateTime @default(now())
 }
+
+model TouristSpot {
+  id          Int      @id @default(autoincrement())
+  category    String   // 'Historical', 'Restaurant', 'Hotel'
+  name_uz     String
+  name_en     String
+  name_ru     String?
+  description_uz String? @db.Text
+  description_en String? @db.Text
+  description_ru String? @db.Text
+  city        String
+  lat         Float
+  lon         Float
+  map_link    String?
+  image_url   String?
+  contact     String?
+  rating      Float?   @default(0.0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}

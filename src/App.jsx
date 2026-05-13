@@ -20,6 +20,9 @@ function App() {
   const [routeSearch, setRouteSearch] = useState({ from: 'Toshkent (TAS)', to: 'Samarqand (SKD)' });
   const [isCalculating, setIsCalculating] = useState(false);
   const [routeResults, setRouteResults] = useState(null);
+  const [spots, setSpots] = useState([]);
+  const [selectedCity, setSelectedCity] = useState('All');
+  const [activeCategory, setActiveCategory] = useState(null); // Historical, Restaurant, Hotel
 
   useEffect(() => {
     // Backend API manzilini aniqlash
@@ -28,16 +31,15 @@ function App() {
       : 'https://opentraveldataoptd-uzbekistan-api.onrender.com';
 
     fetch(`${API_URL}/api/nodes`)
-      .then(res => {
-        if (!res.ok) throw new Error("Serverdan ma'lumot olishda xatolik yuz berdi");
-        return res.json();
-      })
+      .then(res => res.ok ? res.json() : [])
       .then(data => setNodes(data))
-      .catch(err => {
-        console.error('Data fetch error. Using local backup JSON:', err);
-        // Xatolik bo'lsa JSON dan backup olish (hech qanday xatolik ekrani chiqarmaymiz)
-        setNodes(transportNodes);
-      });
+      .catch(() => setNodes(transportNodes));
+
+    fetch(`${API_URL}/api/spots`)
+      .then(res => res.ok ? res.json() : [])
+      .then(data => setSpots(data))
+      .catch(() => setSpots([]));
+  }, []);
   }, []);
 
   const handleCalculateRoute = () => {
@@ -87,10 +89,18 @@ function App() {
   }, [searchQuery, nodes]);
 
   // Helper to get localized name
-  const getLocalizedName = (node) => {
-    if (activeLang === 'en') return node.name_en;
-    if (activeLang === 'ru') return node.name_ru;
-    return node.name_uz; // default uz
+  const getLocalizedName = (item) => {
+    if (!item) return '';
+    if (activeLang === 'en') return item.name_en;
+    if (activeLang === 'ru') return item.name_ru || item.name_uz;
+    return item.name_uz;
+  };
+
+  const getLocalizedDesc = (item) => {
+    if (!item) return '';
+    if (activeLang === 'en') return item.description_en;
+    if (activeLang === 'ru') return item.description_ru || item.description_uz;
+    return item.description_uz;
   };
 
   const translations = {
@@ -107,7 +117,9 @@ function App() {
       notFound: "Hech narsa topilmadi", notFoundDesc: "Boshqa so'z bilan qidirib ko'ring yoki bazaga yangi ma'lumot qo'shing.",
       aviationBox: "Aviatsiya Bazasida", aviationDesc: "ta aeroport va ularning IATA/ICAO kodlari.",
       railBox: "Temir Yo'llar", railDesc: "ta poezd stansiyalari koordinatalari bilan.",
-      multiLangBox: "Ko'p Tilli Tizim", multiLangDesc: "Barcha hududlar 3+ tilda xaritalangan (Geonames/Wiki)."
+      multiLangBox: "Ko'p Tilli Tizim", multiLangDesc: "Barcha hududlar 3+ tilda xaritalangan (Geonames/Wiki).",
+      historical: "Tarixiy joylar", restaurants: "Restoranlar", hotels: "Mehmonxonalar",
+      allCities: "Barcha shaharlar", viewOnMap: "Xaritada ko'rish", call: "Qo'ng'iroq qilish"
     },
     en: { 
       discover: "Discover", routes: "Routes", gps: "Regions (GPS)", admin: "Management",
@@ -122,7 +134,9 @@ function App() {
       notFound: "Nothing found", notFoundDesc: "Try searching with a different keyword or add new data.",
       aviationBox: "Aviation Database", aviationDesc: "airports and their IATA/ICAO codes.",
       railBox: "Railways", railDesc: "train stations with coordinates.",
-      multiLangBox: "Multi-Language System", multiLangDesc: "All regions mapped in 3+ languages (Geonames/Wiki)."
+      multiLangBox: "Multi-Language System", multiLangDesc: "All regions mapped in 3+ languages (Geonames/Wiki).",
+      historical: "Historical Places", restaurants: "Restaurants", hotels: "Hotels",
+      allCities: "All Cities", viewOnMap: "View on Map", call: "Call"
     },
     ru: { 
       discover: "Каталог", routes: "Маршруты", gps: "Регионы (GPS)", admin: "Управление",
@@ -137,7 +151,9 @@ function App() {
       notFound: "Ничего не найдено", notFoundDesc: "Попробуйте поискать с другим словом или добавьте новые данные.",
       aviationBox: "Авиационная база", aviationDesc: "аэропортов и их коды IATA/ICAO.",
       railBox: "Железные дороги", railDesc: "железнодорожных станций с координатами.",
-      multiLangBox: "Многоязычная система", multiLangDesc: "Все регионы отображены на 3+ языках (Geonames/Wiki)."
+      multiLangBox: "Многоязычная система", multiLangDesc: "Все регионы отображены на 3+ языках (Geonames/Wiki).",
+      historical: "Исторические места", restaurants: "Рестораны", hotels: "Отели",
+      allCities: "Все города", viewOnMap: "На карте", call: "Позвонить"
     }
   };
   const t = translations[activeLang] || translations.uz;
@@ -178,6 +194,33 @@ function App() {
           >
             <MapPin size={20} />
             <span className="font-medium">{t.gps}</span>
+          </button>
+
+          <div className="h-px bg-white/5 my-2"></div>
+          <p className="text-[10px] text-muted/50 uppercase tracking-widest px-3 mb-1 mt-2">Tourism</p>
+          
+          <button 
+            onClick={() => { setActiveTab('tourism'); setActiveCategory('Historical'); setCurrentView('home'); }}
+            className={`flex items-center gap-3 p-3 rounded-xl transition-all ${activeTab === 'tourism' && activeCategory === 'Historical' ? 'bg-white/5 text-purple-400 border border-white/10' : 'text-muted hover:text-white hover:bg-white/5'}`}
+          >
+            <Star size={20} />
+            <span className="font-medium">{t.historical}</span>
+          </button>
+          
+          <button 
+            onClick={() => { setActiveTab('tourism'); setActiveCategory('Restaurant'); setCurrentView('home'); }}
+            className={`flex items-center gap-3 p-3 rounded-xl transition-all ${activeTab === 'tourism' && activeCategory === 'Restaurant' ? 'bg-white/5 text-orange-400 border border-white/10' : 'text-muted hover:text-white hover:bg-white/5'}`}
+          >
+            <Activity size={20} />
+            <span className="font-medium">{t.restaurants}</span>
+          </button>
+
+          <button 
+            onClick={() => { setActiveTab('tourism'); setActiveCategory('Hotel'); setCurrentView('home'); }}
+            className={`flex items-center gap-3 p-3 rounded-xl transition-all ${activeTab === 'tourism' && activeCategory === 'Hotel' ? 'bg-white/5 text-green-400 border border-white/10' : 'text-muted hover:text-white hover:bg-white/5'}`}
+          >
+            <Shield size={20} />
+            <span className="font-medium">{t.hotels}</span>
           </button>
           
           {user && (
@@ -365,6 +408,87 @@ function App() {
                   </div>
                 )}
               </div>
+            </div>
+          ) : activeTab === 'tourism' ? (
+            <div className="animate-fade-in">
+              <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
+                <h2 className="text-3xl font-bold flex items-center gap-3">
+                  {activeCategory === 'Historical' && <Star className="text-purple-400" />}
+                  {activeCategory === 'Restaurant' && <Activity className="text-orange-400" />}
+                  {activeCategory === 'Hotel' && <Shield className="text-green-400" />}
+                  {t[activeCategory.toLowerCase() + (activeCategory === 'Historical' ? '' : 's')]}
+                </h2>
+                
+                <div className="flex items-center gap-2 overflow-x-auto pb-2 custom-scrollbar">
+                  {['All', 'Toshkent', 'Samarqand', 'Buxoro', 'Xiva'].map(city => (
+                    <button 
+                      key={city}
+                      onClick={() => setSelectedCity(city)}
+                      className={`px-4 py-2 rounded-full whitespace-nowrap transition ${selectedCity === city ? 'bg-cyan text-black font-bold' : 'bg-white/5 text-muted hover:bg-white/10'}`}
+                    >
+                      {city === 'All' ? t.allCities : city}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {spots
+                  .filter(spot => spot.category === activeCategory && (selectedCity === 'All' || spot.city === selectedCity))
+                  .map(spot => (
+                    <div key={spot.id} className="glass-panel group overflow-hidden hover:border-cyan/30 transition-all flex flex-col">
+                      {spot.image_url && (
+                        <div className="h-48 overflow-hidden relative">
+                          <img src={spot.image_url} alt={getLocalizedName(spot)} className="w-full h-full object-cover group-hover:scale-110 transition-duration-500" />
+                          <div className="absolute top-4 right-4 bg-black/60 backdrop-blur-md px-2 py-1 rounded-lg flex items-center gap-1 text-gold text-xs font-bold border border-white/10">
+                            <Star size={12} fill="currentColor" /> {spot.rating || '5.0'}
+                          </div>
+                        </div>
+                      )}
+                      <div className="p-6 flex-1 flex flex-col">
+                        <h3 className="text-xl font-bold mb-2 group-hover:text-cyan transition-colors">{getLocalizedName(spot)}</h3>
+                        <p className="text-muted text-xs mb-4 line-clamp-3 leading-relaxed">
+                          {getLocalizedDesc(spot)}
+                        </p>
+                        
+                        <div className="mt-auto pt-4 border-t border-white/5 space-y-3">
+                          <div className="flex items-center gap-2 text-xs text-muted">
+                            <MapPin size={14} className="text-cyan" />
+                            <span>{spot.city}</span>
+                          </div>
+                          
+                          <div className="flex items-center gap-2">
+                            {spot.map_link && (
+                              <a 
+                                href={spot.map_link} 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="flex-1 bg-white/5 hover:bg-cyan/10 hover:text-cyan p-2.5 rounded-xl text-center text-xs font-semibold border border-white/5 hover:border-cyan/20 transition-all"
+                              >
+                                {t.viewOnMap}
+                              </a>
+                            )}
+                            {spot.contact && (
+                              <a 
+                                href={`tel:${spot.contact}`}
+                                className="p-2.5 bg-white/5 rounded-xl border border-white/5 hover:bg-white/10 transition-all"
+                                title={t.call}
+                              >
+                                <Activity size={16} className="text-orange-400" />
+                              </a>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+              </div>
+              
+              {spots.filter(spot => spot.category === activeCategory && (selectedCity === 'All' || spot.city === selectedCity)).length === 0 && (
+                <div className="text-center py-20 glass-panel border-dashed border-white/10">
+                  <p className="text-muted italic">{t.notFound}</p>
+                </div>
+              )}
             </div>
           ) : activeTab === 'gps' ? (
             <div className="animate-fade-in">

@@ -1,0 +1,60 @@
+[
+  {
+    "category": "Historical",
+    "name_uz": "Registon maydoni",
+    "name_en": "Registan Square",
+    "name_ru": "Площадь Регистан",
+    "description_uz": "Samarqandning markaziy maydoni va dunyoga mashhur tarixiy obida.",
+    "description_en": "The central square of Samarkand and a world-famous historical monument.",
+    "description_ru": "Центральная площадь Самарканда и всемирно известный исторический памятник.",
+    "city": "Samarqand",
+    "lat": 39.6548,
+    "lon": 66.9757,
+    "map_link": "https://maps.google.com/?q=39.6548,66.9757",
+    "rating": 5.0
+  },
+  {
+    "category": "Historical",
+    "name_uz": "Ichan Qala",
+    "name_en": "Itchan Kala",
+    "name_ru": "Ичан-Кала",
+    "description_uz": "Xivadagi qadimiy shahar va ochiq osmon ostidagi muzey.",
+    "description_en": "The ancient inner city of Khiva and an open-air museum.",
+    "description_ru": "Древний внутренний город Хивы и музей под открытым небом.",
+    "city": "Xiva",
+    "lat": 41.3783,
+    "lon": 60.3639,
+    "map_link": "https://maps.google.com/?q=41.3783,60.3639",
+    "rating": 4.9
+  },
+  {
+    "category": "Restaurant",
+    "name_uz": "Osh Markazi",
+    "name_en": "Plov Center",
+    "name_ru": "Центр плова",
+    "description_uz": "Toshkentdagi eng mashhur milliy taomlar maskani.",
+    "description_en": "The most famous place for national dishes in Tashkent.",
+    "description_ru": "Самое известное место национальной кухни в Ташкенте.",
+    "city": "Toshkent",
+    "lat": 41.3364,
+    "lon": 69.2842,
+    "map_link": "https://maps.google.com/?q=41.3364,69.2842",
+    "contact": "+998 71 234 56 78",
+    "rating": 4.8
+  },
+  {
+    "category": "Hotel",
+    "name_uz": "Hyatt Regency Tashkent",
+    "name_en": "Hyatt Regency Tashkent",
+    "name_ru": "Hyatt Regency Ташкент",
+    "description_uz": "Toshkent markazidagi hashamatli mehmonxona.",
+    "description_en": "Luxury hotel in the center of Tashkent.",
+    "description_ru": "Роскошный отель в центре Ташкента.",
+    "city": "Toshkent",
+    "lat": 41.3164,
+    "lon": 69.2789,
+    "map_link": "https://maps.google.com/?q=41.3164,69.2789",
+    "contact": "+998 71 207 12 34",
+    "rating": 5.0
+  }
+]
