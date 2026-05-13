@@ -42,7 +42,13 @@ async function isAdmin(req, res, next) {
 app.get('/api/nodes', async (req, res) => {
   try {
     const nodes = await prisma.transportNode.findMany();
-    res.json(nodes);
+    // Frontend latitude/longitude deb kutayotgan bo'lishi mumkin
+    const formattedNodes = nodes.map(node => ({
+      ...node,
+      latitude: node.lat,
+      longitude: node.lon
+    }));
+    res.json(formattedNodes);
   } catch (error) {
     console.error('API Error (GET /nodes):', error);
     res.status(500).json({ error: error.message || 'Xatolik yuz berdi' });
