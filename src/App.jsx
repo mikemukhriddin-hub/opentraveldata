@@ -173,10 +173,13 @@ function App() {
             <span className="font-medium">{t.routes}</span>
           </button>
           <div className="h-px bg-white/5 my-2"></div>
-          <a href="#" className="flex items-center gap-3 p-3 rounded-xl text-muted hover:text-white hover:bg-white/5 transition-all">
+          <button 
+            onClick={() => { setActiveTab('gps'); setCurrentView('home'); }}
+            className={`flex items-center gap-3 p-3 rounded-xl transition-all ${activeTab === 'gps' && currentView === 'home' ? 'bg-white/5 text-cyan border border-white/10' : 'text-muted hover:text-white hover:bg-white/5'}`}
+          >
             <MapPin size={20} />
             <span className="font-medium">{t.gps}</span>
-          </a>
+          </button>
           
           {user && (
             <button 
@@ -362,6 +365,46 @@ function App() {
                     {t.selectPrompt}
                   </div>
                 )}
+              </div>
+            </div>
+          ) : activeTab === 'gps' ? (
+            <div className="animate-fade-in">
+              <h2 className="text-3xl font-bold mb-6 flex items-center gap-3">
+                <MapPin className="text-cyan" /> {t.gps}
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                {Object.entries(
+                  nodes.reduce((acc, node) => {
+                    const region = node.region || 'Boshqa';
+                    if (!acc[region]) acc[region] = [];
+                    acc[region].push(node);
+                    return acc;
+                  }, {})
+                ).map(([region, regionNodes]) => (
+                  <div key={region} className="glass-panel p-6 hover:border-cyan/30 transition-colors">
+                    <h3 className="font-bold text-lg mb-4 text-white border-b border-white/10 pb-3 flex items-center justify-between">
+                      {region}
+                      <span className="text-xs font-normal text-muted bg-white/5 px-2 py-1 rounded-full">{regionNodes.length}</span>
+                    </h3>
+                    <ul className="space-y-3 max-h-64 overflow-y-auto pr-2 custom-scrollbar">
+                      {regionNodes.map(node => (
+                        <li key={node.id} className="flex justify-between items-center bg-[#070B14]/60 p-3 rounded-xl border border-white/5 hover:bg-white/5 transition-colors">
+                          <div>
+                            <span className="font-medium text-sm block mb-1">{getLocalizedName(node)}</span>
+                            <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${node.type === 'A' ? 'bg-blue-500/10 text-blue-400' : 'bg-gold/10 text-gold'}`}>
+                              {node.type === 'A' ? 'AEROPORT' : 'STANSIYA'}
+                            </span>
+                          </div>
+                          <div className="text-right">
+                            <span className="text-[10px] font-mono text-cyan bg-cyan/10 px-1.5 py-1 rounded border border-cyan/20">
+                              {node.latitude ? `${node.latitude}, ${node.longitude}` : 'N/A'}
+                            </span>
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
               </div>
             </div>
           ) : searchQuery ? (
