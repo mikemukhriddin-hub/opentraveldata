@@ -23,13 +23,22 @@ export default function AuthModal({ isOpen, onClose, onLogin, activeLang }) {
 
   const handleError = () => {
     console.log('Login Failed');
-    alert("Google orqali kirishda xatolik yuz berdi!");
+    alert(t.error);
   };
 
   const texts = {
-    uz: { title: "Tizimga kirish", desc: "Google hisobingiz orqali bir marta bosish bilan kiring", back: "Orqaga" },
-    en: { title: "Sign In", desc: "Sign in with your Google account in one click", back: "Back" },
-    ru: { title: "Войти", desc: "Войдите через свой Google аккаунт в один клик", back: "Назад" }
+    uz: { 
+      title: "Tizimga kirish", desc: "Google hisobingiz orqali bir marta bosish bilan kiring", back: "Orqaga",
+      error: "Google orqali kirishda xatolik yuz berdi!", secure: "Xavfsiz ulanish", privacy: "\"Google orqali kirish\" xizmati ma'lumotlaringiz maxfiyligini 100% kafolatlaydi."
+    },
+    en: { 
+      title: "Sign In", desc: "Sign in with your Google account in one click", back: "Back",
+      error: "An error occurred during Google sign in!", secure: "Secure connection", privacy: "\"Sign in with Google\" guarantees 100% privacy of your data."
+    },
+    ru: { 
+      title: "Войти", desc: "Войдите через свой Google аккаунт в один клик", back: "Назад",
+      error: "Ошибка при входе через Google!", secure: "Безопасное соединение", privacy: "Служба \"Войти через Google\" гарантирует 100% конфиденциальность ваших данных."
+    }
   };
   const t = texts[activeLang] || texts.uz;
 
@@ -69,13 +78,13 @@ export default function AuthModal({ isOpen, onClose, onLogin, activeLang }) {
 
             <div className="flex items-center gap-4 text-muted text-[10px] uppercase tracking-[0.2em]">
               <div className="flex-1 h-px bg-white/5"></div>
-              Xavfsiz ulanish
+              {t.secure}
               <div className="flex-1 h-px bg-white/5"></div>
             </div>
           </div>
 
           <div className="mt-10 text-center text-[10px] text-muted/40 leading-relaxed italic">
-            "Google orqali kirish" xizmati ma'lumotlaringiz maxfiyligini 100% kafolatlaydi.
+            {t.privacy}
           </div>
         </div>
       </div>

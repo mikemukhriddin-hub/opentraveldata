@@ -98,17 +98,47 @@ function App() {
     uz: { 
       discover: "Katalog", routes: "Yo'nalishlar", gps: "Hududlar (GPS)", admin: "Boshqaruv",
       signIn: "Tizimga kirish", signOut: "Chiqish", searchPlaceholder: "Shahar, stansiya nomi bo'yicha qidiring...",
-      title: "O'zbekiston Ochiq Ma'lumotlar platformasi"
+      title: "O'zbekiston Ochiq Ma'lumotlar platformasi",
+      errorLoad: "Ma'lumotlarni yuklashda xatolik", retry: "Qayta urinish",
+      autoRoutes: "Avtomatik yo'nalishlar", from: "Qayerdan", to: "Qayerga", 
+      calcBtn: "Yo'nalishni hisoblash", calcLoading: "Hisoblanmoqda...",
+      air: "Havo yo'li", rail: "Temir yo'l", duration: "Davomiyligi:", buyTicket: "Chipta olish",
+      selectPrompt: "Shahar va stansiyalarni tanlang va tugmani bosing.",
+      searchResults: "Qidiruv natijalari", edit: "Tahrirlash",
+      notFound: "Hech narsa topilmadi", notFoundDesc: "Boshqa so'z bilan qidirib ko'ring yoki bazaga yangi ma'lumot qo'shing.",
+      aviationBox: "Aviatsiya Bazasida", aviationDesc: "ta aeroport va ularning IATA/ICAO kodlari.",
+      railBox: "Temir Yo'llar", railDesc: "ta poezd stansiyalari koordinatalari bilan.",
+      multiLangBox: "Ko'p Tilli Tizim", multiLangDesc: "Barcha hududlar 3+ tilda xaritalangan (Geonames/Wiki)."
     },
     en: { 
       discover: "Discover", routes: "Routes", gps: "Regions (GPS)", admin: "Management",
       signIn: "Sign In", signOut: "Log Out", searchPlaceholder: "Search by city, station name...",
-      title: "Uzbekistan Open Data Platform"
+      title: "Uzbekistan Open Data Platform",
+      errorLoad: "Error loading data", retry: "Retry",
+      autoRoutes: "Automated Routes", from: "From", to: "To", 
+      calcBtn: "Calculate Route", calcLoading: "Calculating...",
+      air: "Air Route", rail: "Railway", duration: "Duration:", buyTicket: "Get Ticket",
+      selectPrompt: "Select cities and stations and click the button.",
+      searchResults: "Search Results", edit: "Edit",
+      notFound: "Nothing found", notFoundDesc: "Try searching with a different keyword or add new data.",
+      aviationBox: "Aviation Database", aviationDesc: "airports and their IATA/ICAO codes.",
+      railBox: "Railways", railDesc: "train stations with coordinates.",
+      multiLangBox: "Multi-Language System", multiLangDesc: "All regions mapped in 3+ languages (Geonames/Wiki)."
     },
     ru: { 
       discover: "Каталог", routes: "Маршруты", gps: "Регионы (GPS)", admin: "Управление",
       signIn: "Войти", signOut: "Выйти", searchPlaceholder: "Поиск по городам, вокзалам...",
-      title: "Платформа открытых данных Узбекистана"
+      title: "Платформа открытых данных Узбекистана",
+      errorLoad: "Ошибка загрузки данных", retry: "Повторить",
+      autoRoutes: "Автоматические маршруты", from: "Откуда", to: "Куда", 
+      calcBtn: "Рассчитать маршрут", calcLoading: "Расчет...",
+      air: "Авиарейс", rail: "Железная дорога", duration: "Продолжительность:", buyTicket: "Купить билет",
+      selectPrompt: "Выберите города и станции и нажмите кнопку.",
+      searchResults: "Результаты поиска", edit: "Редактировать",
+      notFound: "Ничего не найдено", notFoundDesc: "Попробуйте поискать с другим словом или добавьте новые данные.",
+      aviationBox: "Авиационная база", aviationDesc: "аэропортов и их коды IATA/ICAO.",
+      railBox: "Железные дороги", railDesc: "железнодорожных станций с координатами.",
+      multiLangBox: "Многоязычная система", multiLangDesc: "Все регионы отображены на 3+ языках (Geonames/Wiki)."
     }
   };
   const t = translations[activeLang] || translations.uz;
@@ -251,13 +281,13 @@ function App() {
               <div className="w-16 h-16 rounded-full bg-red-500/20 flex items-center justify-center text-red-500 mb-6">
                 <X size={32} />
               </div>
-              <h2 className="text-xl font-bold text-white mb-2">Ma'lumotlarni yuklashda xatolik</h2>
+              <h2 className="text-xl font-bold text-white mb-2">{t.errorLoad}</h2>
               <p className="text-muted text-center max-w-md mb-8">{error}</p>
               <button 
                 onClick={() => window.location.reload()}
                 className="px-8 py-3 bg-white/10 hover:bg-white/20 text-white rounded-xl transition-all font-medium"
               >
-                Qayta urinish
+                {t.retry}
               </button>
             </div>
           ) : currentView === 'admin' ? (
@@ -270,12 +300,12 @@ function App() {
           ) : activeTab === 'routes' ? (
             <div className="animate-fade-in">
               <h2 className="text-3xl font-bold mb-6 flex items-center gap-3">
-                <PlaneTakeoff className="text-cyan" /> Avtomatik yo'nalishlar
+                <PlaneTakeoff className="text-cyan" /> {t.autoRoutes}
               </h2>
               <div className="glass-panel p-8 mb-8">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-end">
                   <div>
-                    <label className="block text-sm text-muted mb-2">Qayerdan</label>
+                    <label className="block text-sm text-muted mb-2">{t.from}</label>
                     <select 
                       value={routeSearch.from}
                       onChange={(e) => setRouteSearch({...routeSearch, from: e.target.value})}
@@ -287,7 +317,7 @@ function App() {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm text-muted mb-2">Qayerga</label>
+                    <label className="block text-sm text-muted mb-2">{t.to}</label>
                     <select 
                       value={routeSearch.to}
                       onChange={(e) => setRouteSearch({...routeSearch, to: e.target.value})}
@@ -305,7 +335,7 @@ function App() {
                   className="btn-primary w-full mt-6 py-4 flex items-center justify-center gap-2 disabled:opacity-50"
                 >
                   {isCalculating ? <Activity size={20} className="animate-spin" /> : <Activity size={20} />}
-                  {isCalculating ? 'Hisoblanmoqda...' : "Yo'nalishni hisoblash"}
+                  {isCalculating ? t.calcLoading : t.calcBtn}
                 </button>
               </div>
 
@@ -315,21 +345,21 @@ function App() {
                     <div>
                       <div className="flex items-center gap-2 mb-2">
                         <span className={`text-xs font-bold px-2 py-0.5 rounded ${res.type === 'air' ? 'bg-cyan/10 text-cyan' : 'bg-gold/10 text-gold'}`}>
-                          {res.type === 'air' ? "Havo yo'li" : "Temir yo'l"}
+                          {res.type === 'air' ? t.air : t.rail}
                         </span>
                         <span className="text-muted text-xs">{res.carrier}</span>
                       </div>
                       <h4 className="font-bold text-lg">{res.from} → {res.to}</h4>
-                      <p className="text-sm text-muted">Davomiyligi: {res.duration}</p>
+                      <p className="text-sm text-muted">{t.duration} {res.duration}</p>
                     </div>
                     <div className="text-right">
                       <div className={`text-2xl font-bold ${res.type === 'air' ? 'text-cyan' : 'text-gold'}`}>{res.price}</div>
-                      <button className="text-xs text-muted hover:text-white underline mt-1">Chipta olish</button>
+                      <button className="text-xs text-muted hover:text-white underline mt-1">{t.buyTicket}</button>
                     </div>
                   </div>
                 )) : !isCalculating && (
                   <div className="text-center py-10 text-muted italic">
-                    Shahar va stansiyalarni tanlang va tugmani bosing.
+                    {t.selectPrompt}
                   </div>
                 )}
               </div>
@@ -338,7 +368,7 @@ function App() {
             // Search Results
             <div className="animate-fade-in">
               <h2 className="text-xl font-semibold mb-4 text-cyan flex items-center gap-2">
-                Qidiruv natijalari <span className="text-sm bg-white/10 px-2 py-0.5 rounded-full text-white">{filteredNodes.length}</span>
+                {t.searchResults} <span className="text-sm bg-white/10 px-2 py-0.5 rounded-full text-white">{filteredNodes.length}</span>
               </h2>
               {filteredNodes.length > 0 ? (
                 <div className="grid grid-cols-1 gap-3">
@@ -365,7 +395,7 @@ function App() {
                           <button 
                             onClick={(e) => { e.stopPropagation(); setEditingNode(node); }}
                             className="mr-3 p-2 bg-cyan/10 hover:bg-cyan/20 text-cyan rounded-full transition-colors flex items-center justify-center border border-cyan/20 shadow-[0_0_10px_rgba(0,229,255,0.2)]"
-                            title="Tahrirlash"
+                            title={t.edit}
                           >
                             <Edit2 size={16} />
                           </button>
@@ -382,8 +412,8 @@ function App() {
                   <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-4">
                     <Search size={30} className="text-muted" />
                   </div>
-                  <h3 className="text-xl font-medium mb-2">Hech narsa topilmadi</h3>
-                  <p className="text-muted">Boshqa so'z bilan qidirib ko'ring yoki bazaga yangi ma'lumot qo'shing.</p>
+                  <h3 className="text-xl font-medium mb-2">{t.notFound}</h3>
+                  <p className="text-muted">{t.notFoundDesc}</p>
                 </div>
               )}
             </div>
@@ -395,8 +425,8 @@ function App() {
                   <div className="w-12 h-12 rounded-xl bg-cyan/10 flex items-center justify-center text-cyan mb-4 group-hover:scale-110 transition-transform">
                     <PlaneTakeoff size={24} />
                   </div>
-                  <h3 className="text-xl font-bold mb-2">Aviatsiya Bazasida</h3>
-                  <p className="text-muted text-sm">{nodes.filter(n=>n.type==='A').length} ta aeroport va ularning IATA/ICAO kodlari.</p>
+                  <h3 className="text-xl font-bold mb-2">{t.aviationBox}</h3>
+                  <p className="text-muted text-sm">{nodes.filter(n=>n.type==='A').length} {t.aviationDesc}</p>
                 </div>
                 
                 <div className="glass-panel p-6 group cursor-pointer hover:-translate-y-1 transition-transform duration-300 relative overflow-hidden">
@@ -406,16 +436,16 @@ function App() {
                   <div className="w-12 h-12 rounded-xl bg-gold/10 flex items-center justify-center text-gold mb-4 group-hover:scale-110 transition-transform">
                     <Train size={24} />
                   </div>
-                  <h3 className="text-xl font-bold mb-2">Temir Yo'llar</h3>
-                  <p className="text-muted text-sm">{nodes.filter(n=>n.type==='R').length} ta poezd stansiyalari koordinatalari bilan.</p>
+                  <h3 className="text-xl font-bold mb-2">{t.railBox}</h3>
+                  <p className="text-muted text-sm">{nodes.filter(n=>n.type==='R').length} {t.railDesc}</p>
                 </div>
 
                 <div className="glass-panel p-6 group cursor-pointer hover:-translate-y-1 transition-transform duration-300">
                   <div className="w-12 h-12 rounded-xl bg-purple-500/10 flex items-center justify-center text-purple-400 mb-4 group-hover:scale-110 transition-transform">
                     <Globe size={24} />
                   </div>
-                  <h3 className="text-xl font-bold mb-2">Ko'p Tilli Tizim</h3>
-                  <p className="text-muted text-sm">Barcha hududlar 3+ tilda xaritalangan (Geonames/Wiki).</p>
+                  <h3 className="text-xl font-bold mb-2">{t.multiLangBox}</h3>
+                  <p className="text-muted text-sm">{t.multiLangDesc}</p>
                 </div>
               </div>
             </div>
