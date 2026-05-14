@@ -143,6 +143,63 @@ app.delete('/api/spots/:id', isAdmin, async (req, res) => {
   }
 });
 
+// --- Telegram Bot Integration ---
+const { Telegraf } = require('telegraf');
+
+if (process.env.TELEGRAM_BOT_TOKEN) {
+  const bot = new Telegraf(process.env.TELEGRAM_BOT_TOKEN);
+  
+  bot.start((ctx) => ctx.reply("Salom! Open Travel Data Uzbekistan botiga xush kelibsiz.\n\nQuyidagi shaharlardan birini yozing (masalan: Samarqand) yoki /tourism buyrug'ini bering."));
+
+  bot.command('tourism', async (ctx) => {
+    try {
+      const spots = await prisma.touristSpot.findMany({ take: 5 });
+      if (spots.length === 0) return ctx.reply("Hozircha ma'lumotlar mavjud emas.");
+      
+      let message = "🏛 *Tavsiya etilgan joylar:*\n\n";
+      spots.forEach(spot => {
+        message += `📍 *${spot.name_uz}*\n🏙 ${spot.city}\n🔗 [Xaritada ko'rish](${spot.map_link})\n\n`;
+      });
+      ctx.replyWithMarkdown(message);
+    } catch (error) {
+      console.error('Bot Error:', error);
+      ctx.reply("Ma'lumot olishda xatolik yuz berdi.");
+    }
+  });
+
+  bot.on('text', async (ctx) => {
+    const text = ctx.message.text;
+    if (text.startsWith('/')) return; // Ignore other commands
+
+    try {
+      const spots = await prisma.touristSpot.findMany({
+        where: {
+          city: { contains: text, mode: 'insensitive' }
+        },
+        take: 5
+      });
+      
+      if (spots.length === 0) {
+        return ctx.reply(`Afsuski, "${text}" shahri bo'yicha ma'lumot topilmadi.`);
+      }
+
+      let message = `🏙 *${text}* shahridagi joylar:\n\n`;
+      spots.forEach(spot => {
+        message += `🏛 *${spot.name_uz}*\n🔗 [Xaritada ko'rish](${spot.map_link})\n\n`;
+      });
+      ctx.replyWithMarkdown(message);
+    } catch (error) {
+      ctx.reply("Qidiruvda xatolik yuz berdi.");
+    }
+  });
+
+  bot.launch().then(() => {
+    console.log('Telegram Bot started successfully!');
+  }).catch(err => {
+    console.error('Failed to start Telegram Bot:', err);
+  });
+}
+
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
