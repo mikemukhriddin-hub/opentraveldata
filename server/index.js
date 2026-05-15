@@ -1,6 +1,8 @@
 const express = require('express');
 const cors = require('cors');
 const { PrismaClient } = require('@prisma/client');
+const fs = require('fs');
+const path = require('path');
 const { OAuth2Client } = require('google-auth-library');
 require('dotenv').config();
 
@@ -47,7 +49,6 @@ async function isAdmin(req, res, next) {
 app.get('/api/nodes', async (req, res) => {
   try {
     const nodes = await prisma.transportNode.findMany();
-    // Frontend latitude/longitude deb kutayotgan bo'lishi mumkin
     const formattedNodes = nodes.map(node => ({
       ...node,
       latitude: node.lat,
@@ -55,8 +56,14 @@ app.get('/api/nodes', async (req, res) => {
     }));
     res.json(formattedNodes);
   } catch (error) {
-    console.error('API Error (GET /nodes):', error);
-    res.status(500).json({ error: error.message || 'Xatolik yuz berdi' });
+    console.warn('Database unreachable, falling back to local JSON data.');
+    // Fallback: transport_nodes.json faylidan o'qish
+    try {
+      const localNodes = require('../src/data/transport_nodes.json');
+      res.json(localNodes);
+    } catch (fallbackError) {
+      res.status(500).json({ error: 'Baza va lokal fayl bilan bog\'lanishda xatolik' });
+    }
   }
 });
 
@@ -66,7 +73,17 @@ app.post('/api/nodes', isAdmin, async (req, res) => {
     const newNode = await prisma.transportNode.create({ data: req.body });
     res.json(newNode);
   } catch (error) {
-    res.status(500).json({ error: 'Qo\'shishda xatolik' });
+    console.warn('Database error on POST /nodes, falling back to local file.');
+    try {
+      const filePath = path.join(__dirname, '../src/data/transport_nodes.json');
+      const data = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+      const newNode = { id: Date.now(), ...req.body };
+      data.push(newNode);
+      fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
+      res.json(newNode);
+    } catch (fallbackError) {
+      res.status(500).json({ error: 'Qo\'shishda xatolik (Baza va Lokal)' });
+    }
   }
 });
 
@@ -79,7 +96,21 @@ app.put('/api/nodes/:id', isAdmin, async (req, res) => {
     });
     res.json(updated);
   } catch (error) {
-    res.status(500).json({ error: 'Tahrirlashda xatolik' });
+    console.warn('Database error on PUT /nodes, falling back to local file.');
+    try {
+      const filePath = path.join(__dirname, '../src/data/transport_nodes.json');
+      const data = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+      const index = data.findIndex(n => n.id === parseInt(req.params.id));
+      if (index !== -1) {
+        data[index] = { ...data[index], ...req.body };
+        fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
+        res.json(data[index]);
+      } else {
+        res.status(404).json({ error: 'Topilmadi' });
+      }
+    } catch (fallbackError) {
+      res.status(500).json({ error: 'Tahrirlashda xatolik (Baza va Lokal)' });
+    }
   }
 });
 
@@ -106,7 +137,18 @@ app.get('/api/spots', async (req, res) => {
     const spots = await prisma.touristSpot.findMany({ where });
     res.json(spots);
   } catch (error) {
-    res.status(500).json({ error: 'Ma\'lumotlarni olishda xatolik' });
+    console.warn('Spots database unreachable, falling back to local JSON data.');
+    try {
+      // Zaxira ma'lumotlar (serverda spots.json bor deb faraz qilamiz yoki nodes'dan filtrlaymiz)
+      const localSpots = require('./prisma/spots.json'); 
+      const filtered = localSpots.filter(s => 
+        (!category || s.category === category) && 
+        (!city || s.city === city)
+      );
+      res.json(filtered);
+    } catch (fallbackError) {
+      res.json([]); // Hech bo'lmasa bo'sh massiv qaytaramiz
+    }
   }
 });
 
@@ -146,6 +188,8 @@ app.delete('/api/spots/:id', isAdmin, async (req, res) => {
 // --- Telegram Bot Integration ---
 const { Telegraf } = require('telegraf');
 
+console.log('Checking Telegram Bot Token...', process.env.TELEGRAM_BOT_TOKEN ? 'Found' : 'Not Found');
+
 if (process.env.TELEGRAM_BOT_TOKEN) {
   const bot = new Telegraf(process.env.TELEGRAM_BOT_TOKEN);
   
@@ -153,6 +197,7 @@ if (process.env.TELEGRAM_BOT_TOKEN) {
 
   bot.command('tourism', async (ctx) => {
     try {
+      // Use the global prisma instance explicitly
       const spots = await prisma.touristSpot.findMany({ take: 5 });
       if (spots.length === 0) return ctx.reply("Hozircha ma'lumotlar mavjud emas.");
       
@@ -172,6 +217,7 @@ if (process.env.TELEGRAM_BOT_TOKEN) {
     if (text.startsWith('/')) return; // Ignore other commands
 
     try {
+      // Baza bilan bog'lanishni tekshirish
       const spots = await prisma.touristSpot.findMany({
         where: {
           city: { contains: text, mode: 'insensitive' }
@@ -189,6 +235,7 @@ if (process.env.TELEGRAM_BOT_TOKEN) {
       });
       ctx.replyWithMarkdown(message);
     } catch (error) {
+      console.error('Bot Search Error:', error);
       ctx.reply("Qidiruvda xatolik yuz berdi.");
     }
   });

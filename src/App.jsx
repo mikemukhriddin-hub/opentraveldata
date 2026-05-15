@@ -5,6 +5,9 @@ import AuthModal from './components/AuthModal';
 import EditModal from './components/EditModal';
 import ApiModal from './components/ApiModal';
 import AdminPanel from './components/AdminPanel';
+import LoginPage from './components/LoginPage';
+import Background3D from './components/Background3D';
+import { jwtDecode } from 'jwt-decode';
 
 function App() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -157,8 +160,22 @@ function App() {
   };
   const t = translations[activeLang] || translations.uz;
 
+  if (!user) {
+    return (
+      <LoginPage 
+        onLoginSuccess={(credentialResponse) => {
+          const decoded = jwtDecode(credentialResponse.credential);
+          setUser(decoded);
+          localStorage.setItem('user', JSON.stringify(decoded));
+        }} 
+      />
+    );
+  }
+
   return (
-    <div className="flex min-h-screen">
+    <div className="relative h-screen bg-transparent text-white overflow-hidden font-sans">
+      <Background3D view={currentView} category={activeCategory} />
+      <div className="flex h-screen relative z-10">
       {/* Sidebar Overlay (For desktop, static sidebar) */}
       <div className="hidden md:flex flex-col w-64 glass-panel border-l-0 border-t-0 border-b-0 rounded-none h-screen fixed left-0 top-0">
         <div className="p-6 flex items-center gap-3 border-b border-white/5">
@@ -547,7 +564,10 @@ function App() {
                   <p className="text-muted text-sm">{nodes.filter(n=>n.type==='A').length} {t.aviationDesc}</p>
                 </div>
                 
-                <div className="glass-panel p-6 group cursor-pointer hover:-translate-y-1 transition-transform duration-300 relative overflow-hidden">
+                <div 
+                  onClick={() => { setCurrentView('routes'); setSearchQuery(''); }}
+                  className="glass-panel p-6 group cursor-pointer hover:-translate-y-1 transition-transform duration-300 relative overflow-hidden"
+                >
                   <div className="absolute -top-4 -right-4 p-4 opacity-10">
                     <Train size={120} />
                   </div>
@@ -559,7 +579,7 @@ function App() {
                 </div>
 
                 <button 
-                  onClick={() => { setSearchQuery(''); setActiveTab('tourism'); setActiveCategory('Historical'); }}
+                  onClick={() => { setCurrentView('nature'); setSearchQuery(''); }}
                   className="glass-panel p-6 group cursor-pointer hover:-translate-y-1 transition-transform duration-300 border border-purple-500/10 hover:border-purple-500/30 text-left w-full"
                 >
                   <div className="w-12 h-12 rounded-xl bg-purple-500/10 flex items-center justify-center text-purple-400 mb-4 group-hover:scale-110 transition-transform">
@@ -592,6 +612,7 @@ function App() {
         isOpen={isApiOpen}
         onClose={() => setIsApiOpen(false)}
       />
+      </div>
     </div>
   );
 }
