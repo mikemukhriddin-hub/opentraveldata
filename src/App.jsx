@@ -34,12 +34,12 @@ function App() {
       : 'https://opentraveldataoptd-uzbekistan-api.onrender.com';
 
     fetch(`${API_URL}/api/nodes`)
-      .then(res => res.ok ? res.json() : [])
+      .then(res => res.ok ? res.json() : Promise.reject('Nodes 404'))
       .then(data => setNodes(data))
       .catch(() => setNodes(transportNodes));
 
     fetch(`${API_URL}/api/spots`)
-      .then(res => res.ok ? res.json() : [])
+      .then(res => res.ok ? res.json() : Promise.reject('Spots 404'))
       .then(data => setSpots(data))
       .catch(() => setSpots([]));
   }, []);
@@ -76,18 +76,16 @@ function App() {
     }, 1500);
   };
 
-  // Search/Filter Logic
+  // Smart Search/Filter Logic
   const filteredNodes = useMemo(() => {
     if (!searchQuery) return [];
-    const lowerQuery = searchQuery.toLowerCase();
+    const queries = searchQuery.toLowerCase().split(' ').filter(q => q.length > 1);
     
-    return nodes.filter(node => 
-      node.iata_code?.toLowerCase().includes(lowerQuery) ||
-      node.locode?.toLowerCase().includes(lowerQuery) ||
-      node.name_uz?.toLowerCase().includes(lowerQuery) ||
-      node.name_en?.toLowerCase().includes(lowerQuery) ||
-      node.region?.toLowerCase().includes(lowerQuery)
-    );
+    return nodes.filter(node => {
+      const nodeText = `${node.iata_code} ${node.locode} ${node.name_uz} ${node.name_en} ${node.region}`.toLowerCase();
+      // Check if any part of the node matches any of the query words
+      return queries.some(q => nodeText.includes(q));
+    });
   }, [searchQuery, nodes]);
 
   // Helper to get localized name
@@ -173,7 +171,7 @@ function App() {
   }
 
   return (
-    <div className="relative h-screen bg-transparent text-white overflow-hidden font-sans">
+    <div className="relative h-screen bg-transparent text-white overflow-y-auto font-sans">
       <Background3D view={currentView} category={activeCategory} />
       <div className="flex h-screen relative z-10">
       {/* Sidebar Overlay (For desktop, static sidebar) */}
